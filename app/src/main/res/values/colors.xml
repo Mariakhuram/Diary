@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="text_View_Bold">#434343</color>
+    <color name="text_Color">#5B5B5B</color>
+    <color name="radio_Color">#FFACF8</color>
+    <color name="viewBackground">#F1F1F1</color>
+    <color name="pinkButtonColor">#9F9DFF</color>
+    <color name="textViewSmooth">#9B9396</color>
+    <color name="selected_State_Color">#263238</color>
+    <color name="smoothBack">#EDEDED</color>
+    <color name="hastagColor">#999898</color>
+    <color name="red_Smooth">#FD556E</color>
+    <color name="d9D9">#D9D9D9</color>
+    <color name="smoothPink">#FFDFDF</color>
+    <color name="unselected_State_Color">#707B89</color>
+    //font_text_Colors_Pattern
+    <color name="colorOne_Purple">#837FD3</color>
+    <color name="colorTwo_Red">#FF0000</color>
+    <color name="colorThree_Blue">#00E0FF</color>
+    <color name="colorFour_Pink">#FFA5E6</color>
+    <color name="colorFive_Green">#61FF00</color>
+    <color name="colorSix_Yellow">#FBFF44</color>
+</resources>

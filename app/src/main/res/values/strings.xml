@@ -1,0 +1,59 @@
+<resources>
+    <string name="app_name">Diary</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="language">Language</string>
+    <string name="spanish">Spanish</string>
+    <string name="english">English</string>
+    <string name="italian">Italian</string>
+    <string name="chinese">Chinese</string>
+    <string name="hindi">Hindi</string>
+    <string name="saveandsecure">Save and Secure</string>
+    <string name="letsgo">Let\'s Go!</string>
+    <string name="letsstart">Let\'s start!</string>
+    <string name="setpasscode">Set Passcode</string>
+    <string name="getReady">Get Ready</string>
+    <string name="welcome">Welcome!</string>
+    <string name="save">Save</string>
+    <string name="deletedsuccessfuly">Deleted Successfully</string>
+    <string name="done">Done</string>
+    <string name="addAudioFiles">Add Audio Files</string>
+    <string name="title">Title</string>
+    <string name="background">Background</string>
+    <string name="image">Image</string>
+    <string name="emoji">Emoji</string>
+    <string name="allCapitalLettersTextview">AA</string>
+    <string name="normalLettersTextview">Aa</string>
+    <string name="allsmallLettersTextview">aa</string>
+    <string name="recording">Recording</string>
+    <string name="hashtag">HashTag</string>
+    <string name="maxImageSize">Maximum of 4 images allowed</string>
+    <string name="text">Text</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="voice">Voice</string>
+    <string name="deletethisentery">Delete this entry?</string>
+    <string name="deletethisenterydsc">Deleting this entry is permanent and you can’t undo it.</string>
+    <string name="dontsaveyet">Not saved yet</string>
+    <string name="dontsaveyetdsc">Do you want to save the changes you’ve made?</string>
+    <string name="photo">Photo</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard">Discard</string>
+    <string name="selectDate">Select Date</string>
+    <string name="starttypinghere">Start typing here...</string>
+    <string name="welcomehint">Welcome</string>
+    <string name="welcomeDetails">welcome to write your memories</string>
+    <string name="welcomeFor">Welcome to your diary for.
+</string>
+    <string name="mydairy">My dairy</string>
+    <string name="emptyDesc">Write to your diary for specious memories!
+</string>
+    <string name="howwasyourdaytoday">How was your day today?</string>
+    <string name="writeherefirstMemeory">write your first memory here!</string>
+    <string name="welcomeDsc">Welcome to your diary for writing  memories!
+</string>
+    <string name="getDsc">Start writing, for every moment is worth
+preseriving.</string>
+    <string name="passwordDesc">Lockup your diary, keep your thoughts and memories safe. Your diary, your rules!</string>
+    <string name="monday">Monday</string>
+    <string name="preview">Preview</string>
+</resources>

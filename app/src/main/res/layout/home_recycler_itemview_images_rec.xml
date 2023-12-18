@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    android:layout_width="@dimen/_50sdp"
+    android:layout_height="@dimen/_50sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/imageViewCFour"
+    android:layout_marginTop="@dimen/_4sdp"
+    android:layout_marginStart="@dimen/_8sdp"
+    app:cardCornerRadius="@dimen/_6sdp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="@id/imageViewCThree"
+    app:layout_constraintBottom_toBottomOf="@id/imageViewCThree"
+    app:layout_constraintStart_toEndOf="@id/imageViewCThree"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:id="@+id/imageViewFour"/>
+</androidx.cardview.widget.CardView>

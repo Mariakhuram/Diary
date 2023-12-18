@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:fillViewport="true"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_image"
+    tools:context=".presentation.ui.tabs.CalenderFragment">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/_30sdp"
+            android:id="@+id/bottomSheetDatePickerBtn"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/monthDateTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Jan 2023"
+                android:textSize="@dimen/_14ssp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="@dimen/_17sdp"
+                android:layout_height="@dimen/_15sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:src="@drawable/arrow_down"
+                app:layout_constraintStart_toEndOf="@+id/monthDateTv"
+                app:layout_constraintTop_toTopOf="@+id/monthDateTv" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <ImageView
+            android:id="@+id/calenViewBtn"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_marginEnd="@dimen/_25sdp"
+            android:layout_marginBottom="@dimen/_3sdp"
+            android:src="@drawable/calendar_lay_icone_"
+            app:layout_constraintBottom_toBottomOf="@+id/bottomSheetDatePickerBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/bottomSheetDatePickerBtn" />
+        <TextView
+            android:id="@+id/s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:text="Sun"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintStart_toStartOf="@id/bottomSheetDatePickerBtn"
+            app:layout_constraintTop_toBottomOf="@+id/bottomSheetDatePickerBtn" />
+        <TextView
+            android:id="@+id/m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mon"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintEnd_toStartOf="@+id/t"
+            app:layout_constraintStart_toEndOf="@id/s"
+            app:layout_constraintTop_toTopOf="@id/s"
+            app:layout_constraintBottom_toBottomOf="@id/s"/>
+
+        <TextView
+            android:id="@+id/t"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tue"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintEnd_toStartOf="@+id/w"
+            app:layout_constraintStart_toEndOf="@id/m"
+            app:layout_constraintTop_toTopOf="@id/s"
+            app:layout_constraintBottom_toBottomOf="@id/s"/>
+
+        <TextView
+            android:id="@+id/w"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wed"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintEnd_toStartOf="@+id/th"
+            app:layout_constraintStart_toEndOf="@id/t"
+            app:layout_constraintTop_toTopOf="@id/s"
+            app:layout_constraintBottom_toBottomOf="@id/s"/>
+
+        <TextView
+            android:id="@+id/th"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thu"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintEnd_toStartOf="@+id/f"
+            app:layout_constraintStart_toEndOf="@id/w"
+            app:layout_constraintTop_toTopOf="@id/s"
+            app:layout_constraintBottom_toBottomOf="@id/s"/>
+
+        <TextView
+            android:id="@+id/f"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fir"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintEnd_toStartOf="@+id/sa"
+            app:layout_constraintStart_toEndOf="@+id/th"
+            app:layout_constraintTop_toTopOf="@id/s"
+            app:layout_constraintBottom_toBottomOf="@id/s"/>
+
+        <TextView
+            android:id="@+id/sa"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sat"
+            android:textSize="@dimen/_12ssp"
+            android:fontFamily="@font/poppins"
+            app:layout_constraintEnd_toEndOf="@id/calenViewBtn"
+            app:layout_constraintTop_toTopOf="@id/s"
+            app:layout_constraintBottom_toBottomOf="@id/s"/>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:background="@null"
+            app:tabMode="scrollable"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sa" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_marginStart="@dimen/_20sdp"
+
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_height="@dimen/_200sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sa" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

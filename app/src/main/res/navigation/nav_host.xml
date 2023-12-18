@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_host"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.mk.diary.presentation.ui.tabs.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_noteViewDetailsFragment2"
+            app:destination="@id/noteViewDetailsFragment2" />
+        <action
+            android:id="@+id/action_homeFragment_to_noteViewSearchFragment"
+            app:destination="@id/noteViewSearchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/galleryFragment"
+        android:name="com.mk.diary.presentation.ui.tabs.GalleryFragment"
+        android:label="fragment_gallery"
+        tools:layout="@layout/fragment_gallery" />
+    <fragment
+        android:id="@+id/createNoteFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.CreateNoteFragment"
+        android:label="fragment_create_note"
+        tools:layout="@layout/fragment_create_note" >
+        <action
+            android:id="@+id/action_createNoteFragment_to_preViewNoteFragment"
+            app:destination="@id/preViewNoteFragment" />
+        <action
+            android:id="@+id/action_createNoteFragment_to_imageViewDetailsFragment"
+            app:destination="@id/imageViewDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/calenderFragment2"
+        android:name="com.mk.diary.presentation.ui.tabs.CalenderFragment"
+        android:label="fragment_calender"
+        tools:layout="@layout/fragment_calender" />
+    <fragment
+        android:id="@+id/menuSettingsFragment"
+        android:name="com.mk.diary.presentation.ui.settings.MenuSettingsFragment"
+        android:label="fragment_menu_settings"
+        tools:layout="@layout/fragment_menu_settings" />
+    <fragment
+        android:id="@+id/noteViewSearchFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.NoteViewSearchFragment"
+        android:label="fragment_note_view_search"
+        tools:layout="@layout/fragment_note_view_search" />
+    <fragment
+        android:id="@+id/noteViewDetailsFragment2"
+        android:name="com.mk.diary.presentation.ui.noteview.NoteViewDetailsFragment"
+        android:label="fragment_note_view_details"
+        tools:layout="@layout/fragment_note_view_details" >
+        <action
+            android:id="@+id/action_noteViewDetailsFragment2_to_editNoteFragment"
+            app:destination="@id/editNoteFragment" />
+        <action
+            android:id="@+id/action_noteViewDetailsFragment2_to_imageViewDetailsFragment"
+            app:destination="@id/imageViewDetailsFragment" />
+        <action
+            android:id="@+id/action_noteViewDetailsFragment2_to_noteViewDetailsImageViewFragment"
+            app:destination="@id/noteViewDetailsImageViewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/preViewNoteFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.PreViewNoteFragment"
+        android:label="fragment_pre_view_note"
+        tools:layout="@layout/fragment_pre_view_note" />
+    <fragment
+        android:id="@+id/editNoteFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.EditNoteFragment"
+        android:label="fragment_edit_note"
+        tools:layout="@layout/fragment_edit_note" />
+    <fragment
+        android:id="@+id/imageViewDetailsFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.ImageViewDetailsFragment"
+        android:label="fragment_image_view_details"
+        tools:layout="@layout/fragment_image_view_details" />
+    <fragment
+        android:id="@+id/noteViewDetailsImageViewFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.NoteViewDetailsImageViewFragment"
+        android:label="fragment_note_view_details_image_view"
+        tools:layout="@layout/fragment_note_view_details_image_view" />
+</navigation>

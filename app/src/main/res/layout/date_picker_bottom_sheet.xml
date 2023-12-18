@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="@dimen/_20sdp"
+    android:layout_height="@dimen/_320sdp">
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cancelBtn"
+        android:layout_width="@dimen/_22sdp"
+        android:layout_height="@dimen/_22sdp"
+        app:cardCornerRadius="@dimen/_11sdp"
+        android:layout_marginEnd="@dimen/_2sdp"
+        app:cardElevation="@dimen/_4sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:padding="@dimen/_6sdp"
+            android:src="@drawable/crossicone" />
+    </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/baloo_bhai_2_semibold"
+        android:text="@string/selectDate"
+        android:textColor="@color/text_View_Bold"
+        android:textSize="@dimen/_16ssp"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cancelBtn" />
+    <NumberPicker
+        android:id="@+id/monthPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@null"
+        app:layout_constraintEnd_toStartOf="@id/yearPicker"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView" />
+
+    <NumberPicker
+        android:id="@+id/yearPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/monthPicker"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/monthPicker"
+        app:layout_constraintTop_toTopOf="@+id/monthPicker" />
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_35sdp"
+        app:layout_constraintEnd_toEndOf="@id/cancelBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/_20sdp"
+        app:layout_constraintTop_toBottomOf="@id/yearPicker"
+        android:backgroundTint="@color/pinkButtonColor"
+        android:text="@string/done"
+        android:id="@+id/saveBtn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14ssp"
+        android:gravity="center"
+        android:fontFamily="@font/baloo_bhai_2_semibold"
+        android:background="@drawable/rounded_corners_shape"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/background_image"
+    tools:context=".presentation.ui.tabs.BottomNavigationFragment">
+<!--    <FrameLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/bottom_Bar"-->
+<!--        android:id="@+id/fragmentContainer"/>-->
+
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:background="@drawable/top_rounded_bottom_shape"-->
+<!--        android:layout_height="@dimen/_50sdp"-->
+<!--        android:id="@+id/bottom_Bar">-->
+<!--        <ImageView-->
+<!--            android:layout_width="@dimen/_30sdp"-->
+<!--            android:layout_height="@dimen/_30sdp"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            android:layout_gravity="center"-->
+
+<!--            app:layout_constraintEnd_toStartOf="@id/galleryFragmentBtn"-->
+<!--            android:id="@+id/homeFragmentBtn"-->
+<!--            android:src="@drawable/homefragmenticone"/>-->
+<!--        <ImageView-->
+<!--            android:layout_width="@dimen/_30sdp"-->
+<!--            android:layout_height="@dimen/_30sdp"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@id/homeFragmentBtn"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/nullController"-->
+<!--            android:id="@+id/galleryFragmentBtn"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:src="@drawable/galleryicone"/>-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/nullController"-->
+<!--            android:layout_width="@dimen/_50sdp"-->
+<!--            android:layout_height="@dimen/_50sdp"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/callenderFragmentBtn"-->
+<!--            app:layout_constraintStart_toEndOf="@id/galleryFragmentBtn" />-->
+<!--        <ImageView-->
+<!--            android:layout_width="@dimen/_30sdp"-->
+<!--            android:layout_height="@dimen/_30sdp"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@id/nullController"-->
+<!--            app:layout_constraintEnd_toStartOf="@+id/menuSettingsFragmentBtn"-->
+<!--            android:id="@+id/callenderFragmentBtn"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:src="@drawable/calenderviewicnoe"/>-->
+<!--        <ImageView-->
+<!--            android:layout_width="@dimen/_30sdp"-->
+<!--            android:layout_height="@dimen/_30sdp"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@id/callenderFragmentBtn"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            android:id="@+id/menuSettingsFragmentBtn"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:src="@drawable/menusettingsicnoe"/>-->
+<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--    <ImageView-->
+<!--        android:id="@+id/createNoteFragmentBtn"-->
+<!--        android:layout_width="@dimen/_55sdp"-->
+<!--        android:layout_height="@dimen/_55sdp"-->
+<!--        android:src="@drawable/createnoteicone"-->
+<!--        android:layout_marginTop="@dimen/_minus14sdp"-->
+<!--        app:layout_constraintTop_toTopOf="@id/bottom_Bar"-->
+<!--        app:layout_constraintEnd_toEndOf="@id/bottom_Bar"-->
+<!--        app:layout_constraintStart_toStartOf="@id/bottom_Bar" />-->
+</androidx.constraintlayout.widget.ConstraintLayout>
