@@ -9,11 +9,13 @@
     <ImageView
         android:layout_width="@dimen/_40sdp"
         android:layout_marginTop="@dimen/_8sdp"
+        android:id="@+id/mainImage"
         android:layout_height="@dimen/_40sdp"
         android:src="@drawable/delete_item_icone"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/mainTitle"
         android:layout_gravity="center"
         android:fontFamily="@font/baloo_bhai_2_bold"
         android:text="@string/deletethisentery"
@@ -27,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_25sdp"
         android:layout_marginEnd="@dimen/_25sdp"
+        android:id="@+id/mainDesc"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/_4sdp"
         android:text="@string/deletethisenterydsc"
@@ -34,19 +37,18 @@
         android:fontFamily="@font/baloo_bhai_2_bold"
         android:textColor="@color/textViewSmooth"
         android:textSize="@dimen/_12ssp" />
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
-        android:background="@drawable/rounded_corners_shape"
-        android:backgroundTint="@color/red_Smooth"
-        android:id="@+id/deleteBtn"
-        android:layout_marginEnd="@dimen/_37sdp"
-        android:layout_marginStart="@dimen/_37sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        >
+
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:background="@drawable/rounded_corners_shape"
+            android:backgroundTint="@color/red_Smooth"
+            android:id="@+id/deleteBtn"
+            android:layout_marginEnd="@dimen/_37sdp"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/_37sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:textAlignment="center"
             android:text="@string/delete"
             android:textColor="@color/white"
@@ -56,29 +58,28 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
-        android:background="@drawable/rounded_corners_shape"
-        android:backgroundTint="@color/unselected_State_Color"
-        android:id="@+id/cancelBtn"
-        android:layout_marginEnd="@dimen/_37sdp"
-        android:layout_marginStart="@dimen/_37sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        >
+
+
+
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/_37sdp"
+            android:layout_marginStart="@dimen/_37sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_height="@dimen/_35sdp"
+            android:background="@drawable/rounded_corners_shape"
+            android:backgroundTint="@color/unselected_State_Color"
+            android:id="@+id/cancelBtn"
             android:textAlignment="center"
             android:text="@string/cancel"
             android:textColor="@color/white"
             android:fontFamily="@font/baloo_bhai_2_bold"
             android:textSize="@dimen/_14ssp"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"/>
 
 </LinearLayout>

@@ -4,14 +4,10 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.mk.diary.R
 import com.mk.diary.domain.models.ImageItem
-import com.mk.mydiary.utils.MyConstants
+import my.dialy.dairy.journal.dairywithlock.R
 
 class TagTitleRecyclerAdapter(private val modelList: List<String>) :
     RecyclerView.Adapter<TagTitleRecyclerAdapter.ViewHolder>() {
@@ -31,16 +27,12 @@ class TagTitleRecyclerAdapter(private val modelList: List<String>) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = modelList[position]
-        if (position == 0) {
-            holder.tv.visibility = View.GONE
-        } else {
             if (item.isNotEmpty()) {
                 holder.tv.visibility = View.VISIBLE
                 holder.tv.text = item
             } else {
                 holder.tv.visibility = View.GONE
             }
-        }
     }
     override fun getItemCount(): Int {
         return modelList.size

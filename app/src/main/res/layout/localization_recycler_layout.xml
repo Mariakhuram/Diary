@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_40sdp"
+    android:id="@+id/cardView"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ImageView
+        android:id="@+id/radioBtn"
+        android:layout_width="@dimen/_15sdp"
+        android:layout_height="@dimen/_15sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/radio_button_unchecked"
+        android:layout_marginStart="@dimen/_14sdp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+    <TextView
+        android:id="@+id/languageTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_Color"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:textSize="@dimen/_12ssp"
+        android:fontFamily="@font/baloo_bhai_2_semibold"
+        app:layout_constraintTop_toTopOf="@id/radioBtn"
+        app:layout_constraintBottom_toBottomOf="@id/radioBtn"
+        app:layout_constraintStart_toEndOf="@id/radioBtn"/>
+    <View
+        android:id="@+id/engV"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@color/viewBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/radioBtn" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

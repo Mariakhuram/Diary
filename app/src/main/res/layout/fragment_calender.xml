@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:fillViewport="true"
     android:layout_height="match_parent"
-    android:background="@drawable/background_image"
-    tools:context=".presentation.ui.tabs.CalenderFragment">
+    tools:context="com.mk.diary.presentation.ui.tabs.CalenderFragment">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -23,11 +22,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_bold"
-                android:text="Jan 2023"
                 android:textSize="@dimen/_14ssp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="@dimen/_17sdp"
@@ -39,7 +36,7 @@
                 app:layout_constraintTop_toTopOf="@+id/monthDateTv" />
         </androidx.constraintlayout.widget.ConstraintLayout>
         <ImageView
-            android:id="@+id/calenViewBtn"
+            android:id="@+id/calenderCurrentDateViewBtn"
             android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_20sdp"
             android:layout_marginEnd="@dimen/_25sdp"
@@ -53,8 +50,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_10sdp"
-            android:text="Sun"
+            android:text="S"
             android:textSize="@dimen/_12ssp"
+            android:layout_marginStart="@dimen/_10sdp"
             android:fontFamily="@font/poppins"
             app:layout_constraintStart_toStartOf="@id/bottomSheetDatePickerBtn"
             app:layout_constraintTop_toBottomOf="@+id/bottomSheetDatePickerBtn" />
@@ -62,7 +60,7 @@
             android:id="@+id/m"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mon"
+            android:text="M"
             android:textSize="@dimen/_12ssp"
             android:fontFamily="@font/poppins"
             app:layout_constraintEnd_toStartOf="@+id/t"
@@ -74,7 +72,7 @@
             android:id="@+id/t"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tue"
+            android:text="T"
             android:textSize="@dimen/_12ssp"
             android:fontFamily="@font/poppins"
             app:layout_constraintEnd_toStartOf="@+id/w"
@@ -86,7 +84,7 @@
             android:id="@+id/w"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Wed"
+            android:text="W"
             android:textSize="@dimen/_12ssp"
             android:fontFamily="@font/poppins"
             app:layout_constraintEnd_toStartOf="@+id/th"
@@ -98,7 +96,7 @@
             android:id="@+id/th"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thu"
+            android:text="T"
             android:textSize="@dimen/_12ssp"
             android:fontFamily="@font/poppins"
             app:layout_constraintEnd_toStartOf="@+id/f"
@@ -110,7 +108,7 @@
             android:id="@+id/f"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fir"
+            android:text="F"
             android:textSize="@dimen/_12ssp"
             android:fontFamily="@font/poppins"
             app:layout_constraintEnd_toStartOf="@+id/sa"
@@ -122,10 +120,10 @@
             android:id="@+id/sa"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sat"
+            android:text="S"
             android:textSize="@dimen/_12ssp"
             android:fontFamily="@font/poppins"
-            app:layout_constraintEnd_toEndOf="@id/calenViewBtn"
+            app:layout_constraintEnd_toEndOf="@id/calenderCurrentDateViewBtn"
             app:layout_constraintTop_toTopOf="@id/s"
             app:layout_constraintBottom_toBottomOf="@id/s"/>
         <com.google.android.material.tabs.TabLayout
@@ -141,14 +139,23 @@
             app:layout_constraintTop_toBottomOf="@+id/sa" />
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_marginStart="@dimen/_20sdp"
-
-            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_width="@dimen/_300sdp"
             android:layout_height="@dimen/_200sdp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/sa"
             android:layout_marginTop="@dimen/_10sdp"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/s"
             app:layout_constraintTop_toBottomOf="@+id/sa" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/_20sdp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical"
+            android:id="@+id/home_Recycler_View"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/viewPager"
+            app:layout_constraintStart_toStartOf="@id/viewPager"
+            app:layout_constraintTop_toBottomOf="@id/viewPager" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -14,7 +14,6 @@ class StringArrayListConverter {
         val listType = object : TypeToken<ArrayList<String>>() {}.type
         Gson().fromJson(value, listType)
     }
-
     @TypeConverter
     fun fromArrayList(list: ArrayList<String>): String {
         // Use Gson or another JSON library to convert the list to a string

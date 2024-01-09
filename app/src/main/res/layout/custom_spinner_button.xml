@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:textSize="@dimen/_12ssp"
+    android:paddingTop="@dimen/_4sdp"
+    android:fontFamily="@font/baloo_bhai_2_semibold"
+    android:textColor="@color/text_View_Bold"
+    android:layout_height="wrap_content"/>

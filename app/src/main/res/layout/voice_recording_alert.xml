@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="@dimen/_20sdp"
+    android:background="@color/white"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nameyourRec"
+        android:fontFamily="@font/baloo_bhai_2_semibold"
+        android:textSize="@dimen/_12ssp"
+        android:textColor="@color/d3d3d"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <EditText
+        android:id="@+id/nameEd"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:textColor="@color/black"
+        android:paddingTop="@dimen/_2sdp"
+        android:backgroundTint="@color/red_Smooth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
+    <TextView
+        android:id="@+id/cancleBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/baloo_bhai_2_medium"
+        android:text="@string/skip"
+        android:textColor="@color/d3d3d"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:textSize="@dimen/_12ssp"
+        app:layout_constraintBottom_toBottomOf="@+id/okBtn"
+        app:layout_constraintEnd_toStartOf="@+id/okBtn"
+        app:layout_constraintTop_toTopOf="@+id/okBtn" />
+    <TextView
+        android:id="@+id/okBtn"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_height="wrap_content"
+        android:text="@string/done"
+        android:textColor="@color/d3d3d"
+        android:fontFamily="@font/baloo_bhai_2_medium"
+        android:textSize="@dimen/_12ssp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameEd" />
+</androidx.constraintlayout.widget.ConstraintLayout>

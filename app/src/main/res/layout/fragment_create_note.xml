@@ -3,17 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:fillViewport="true"
-    android:id="@+id/backGround"
-    android:background="@drawable/background_image"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.noteview.CreateNoteFragment">
+    tools:context="com.mk.diary.presentation.ui.noteview.CreateNoteFragment">
+    <ImageView
+        android:id="@+id/backGround"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/preViewBtn"
         android:layout_width="@dimen/_26sdp"
         android:layout_height="@dimen/_26sdp"
         app:cardCornerRadius="@dimen/_13sdp"
-        app:cardElevation="@dimen/_4sdp"
+        app:cardElevation="@dimen/_2sdp"
         android:layout_margin="@dimen/_25sdp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
         app:layout_constraintEnd_toEndOf="parent">
@@ -29,6 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:windowSoftInputMode="adjustPan"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,6 +44,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:paddingBottom="@dimen/_30sdp"
+            android:id="@+id/removeHas"
             android:layout_height="match_parent">
             <androidx.cardview.widget.CardView
                 android:id="@+id/backBtn"
@@ -91,8 +100,9 @@
                     android:id="@+id/noteViewStatusImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:padding="@dimen/_1sdp"
                     android:layout_gravity="center"
-                    android:src="@drawable/emoji" />
+                    android:src="@drawable/emptynoteviewstatus" />
             </androidx.cardview.widget.CardView>
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
@@ -191,7 +201,6 @@
                 android:layout_marginTop="@dimen/_8sdp"
                 android:background="@null"
                 android:imeOptions="actionNext"
-
                 android:scrollbars="vertical"
                 android:fontFamily="@font/baloo_bhai_2_semibold"
                 android:hint="@string/starttypinghere"
@@ -205,6 +214,7 @@
                 android:id="@+id/ImageViewLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:orientation="vertical"
                 android:paddingBottom="@dimen/_4sdp"
@@ -219,7 +229,6 @@
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2"/>
             </LinearLayout>
-
             <LinearLayout
                 android:id="@+id/voiceLayout"
                 android:layout_width="0dp"
@@ -229,53 +238,12 @@
                 app:layout_constraintEnd_toEndOf="@+id/titleEd"
                 app:layout_constraintStart_toStartOf="@+id/titleEd"
                 app:layout_constraintTop_toBottomOf="@+id/ImageViewLayout">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="@dimen/_120sdp"
-                    android:layout_height="@dimen/_30sdp"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:background="@drawable/rounded_corners_shape"
-                    android:backgroundTint="@color/smoothBack"
-                    app:layout_constraintStart_toStartOf="@+id/ImageViewLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/ImageViewLayout">
-
-                    <ImageView
-                        android:id="@+id/playPauseBtn"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_marginStart="@dimen/_10sdp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/next_arrow"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/unselected_State_Color" />
-
-                    <TextView
-                        android:id="@+id/voiceDuration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:text="Nov 2023"
-                        android:textAlignment="center"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/_10ssp"
-                        android:textStyle="normal"
-                        app:layout_constraintBottom_toBottomOf="@id/playPauseBtn"
-                        app:layout_constraintStart_toEndOf="@id/playPauseBtn"
-                        app:layout_constraintTop_toTopOf="@id/playPauseBtn" />
-
-                    <ImageView
-                        android:id="@+id/voiceDeleteBtn"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:src="@drawable/deleteicone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/voiceRec"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/hashTagLayout"
@@ -300,228 +268,262 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/bottomBar"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/noteviewbottombar"
-        app:layout_constraintStart_toStartOf="parent">
-
+        app:cardElevation="@dimen/_3sdp"
+        android:id="@+id/bottomBar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="wrap_content">
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/backgroundSelectionBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/imageBtn"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <ImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_6sdp"
-                android:src="@drawable/background_selection"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:id="@+id/imgback"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:text="@string/background"
-                android:textAlignment="center"
-                android:textColor="@color/unselected_State_Color"
-                android:textSize="@dimen/_10ssp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/imgback"
-                app:layout_constraintStart_toStartOf="@id/imgback"
-                app:layout_constraintTop_toBottomOf="@id/imgback" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/imageBtn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/backgroundSelectionBtn"
-            app:layout_constraintEnd_toStartOf="@id/emojiBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/noteviewbottombar"
             >
-            <ImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_6sdp"
-                android:src="@drawable/galleryiconesvg"
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/backgroundSelectionBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/imageBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:src="@drawable/background_selection"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/imgback"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:text="@string/background"
+                    android:textAlignment="center"
+                    android:textColor="@color/unselected_State_Color"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/imgback"
+                    app:layout_constraintStart_toStartOf="@id/imgback"
+                    app:layout_constraintTop_toBottomOf="@id/imgback" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/imageBtn"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:id="@+id/imgageback"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
-
-            <TextView
+                app:layout_constraintStart_toEndOf="@+id/backgroundSelectionBtn"
+                app:layout_constraintEnd_toStartOf="@id/emojiBtn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:text="@string/image"
-                android:textAlignment="center"
-                android:textColor="@color/unselected_State_Color"
-                android:textSize="@dimen/_10ssp"
-                android:textStyle="normal"
+                android:layout_height="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/imgageback"
-                app:layout_constraintStart_toStartOf="@id/imgageback"
-                app:layout_constraintTop_toBottomOf="@id/imgageback" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                >
+                <ImageView
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:src="@drawable/galleryiconesvg"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/imgageback"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/emojiBtn"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:text="@string/image"
+                    android:textAlignment="center"
+                    android:textColor="@color/unselected_State_Color"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/imgageback"
+                    app:layout_constraintStart_toStartOf="@id/imgageback"
+                    app:layout_constraintTop_toBottomOf="@id/imgageback" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/emojiBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/textBtn"
+                app:layout_constraintStart_toEndOf="@+id/imageBtn"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/emojiback"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:src="@drawable/emojiicone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:text="@string/emoji"
+                    android:textAlignment="center"
+                    android:textColor="@color/unselected_State_Color"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/emojiback"
+                    app:layout_constraintStart_toStartOf="@id/emojiback"
+                    app:layout_constraintTop_toBottomOf="@id/emojiback" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/textBtn"
+                app:layout_constraintStart_toEndOf="@id/emojiBtn"
+                app:layout_constraintEnd_toStartOf="@id/hashTagBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/textback"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:src="@drawable/textdetailsicone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:text="@string/text"
+                    android:textAlignment="center"
+                    android:textColor="@color/unselected_State_Color"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/textback"
+                    app:layout_constraintStart_toStartOf="@id/textback"
+                    app:layout_constraintTop_toBottomOf="@id/textback" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/hashTagBtn"
+                app:layout_constraintStart_toEndOf="@id/textBtn"
+                app:layout_constraintEnd_toStartOf="@+id/voiceBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/hashback"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:src="@drawable/tagshapeicone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:text="@string/hashtag"
+                    android:textAlignment="center"
+                    android:textColor="@color/unselected_State_Color"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/hashback"
+                    app:layout_constraintStart_toStartOf="@id/hashback"
+                    app:layout_constraintTop_toBottomOf="@id/hashback" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/voiceBtn"
+                app:layout_constraintStart_toEndOf="@id/hashTagBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/voiceback"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:src="@drawable/miceicone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/_3sdp"
+                    android:layout_marginBottom="@dimen/_4sdp"
+                    android:text="@string/voice"
+                    android:textAlignment="center"
+                    android:textColor="@color/unselected_State_Color"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/voiceback"
+                    app:layout_constraintStart_toStartOf="@id/voiceback"
+                    app:layout_constraintTop_toBottomOf="@id/voiceback" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        android:id="@+id/saveNoteAnimation">
+        <include
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/textBtn"
-            app:layout_constraintStart_toEndOf="@+id/imageBtn"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/emojiback"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_6sdp"
-                android:src="@drawable/emojiicone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:text="@string/emoji"
-                android:textAlignment="center"
-                android:textColor="@color/unselected_State_Color"
-                android:textSize="@dimen/_10ssp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/emojiback"
-                app:layout_constraintStart_toStartOf="@id/emojiback"
-                app:layout_constraintTop_toBottomOf="@id/emojiback" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/textBtn"
-            app:layout_constraintStart_toEndOf="@id/emojiBtn"
-            app:layout_constraintEnd_toStartOf="@id/hashTagBtn"
-            android:layout_width="wrap_content"
+            layout="@layout/save_noteview_animation"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        android:id="@+id/tipAnimationBtn">
+        <include
+            android:layout_width="match_parent"
+            android:id="@+id/tipAnimLayout"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/textback"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_6sdp"
-                android:src="@drawable/textdetailsicone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:text="@string/text"
-                android:textAlignment="center"
-                android:textColor="@color/unselected_State_Color"
-                android:textSize="@dimen/_10ssp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/textback"
-                app:layout_constraintStart_toStartOf="@id/textback"
-                app:layout_constraintTop_toBottomOf="@id/textback" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/hashTagBtn"
-            app:layout_constraintStart_toEndOf="@id/textBtn"
-            app:layout_constraintEnd_toStartOf="@+id/voiceBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/hashback"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_6sdp"
-                android:src="@drawable/tagshapeicone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:text="@string/hashtag"
-                android:textAlignment="center"
-                android:textColor="@color/unselected_State_Color"
-                android:textSize="@dimen/_10ssp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/hashback"
-                app:layout_constraintStart_toStartOf="@id/hashback"
-                app:layout_constraintTop_toBottomOf="@id/hashback" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/voiceBtn"
-            app:layout_constraintStart_toEndOf="@id/hashTagBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/voiceback"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_6sdp"
-                android:src="@drawable/miceicone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_3sdp"
-                android:layout_marginBottom="@dimen/_4sdp"
-                android:text="@string/voice"
-                android:textAlignment="center"
-                android:textColor="@color/unselected_State_Color"
-                android:textSize="@dimen/_10ssp"
-                android:textStyle="normal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/voiceback"
-                app:layout_constraintStart_toStartOf="@id/voiceback"
-                app:layout_constraintTop_toBottomOf="@id/voiceback" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            layout="@layout/tip_anim_layout"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

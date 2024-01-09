@@ -1,20 +1,11 @@
 package com.mk.diary.adapters.recyclerview
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.mk.diary.R
-import com.mk.diary.databinding.HomeNoteviewFragmentReyclerLayoutBinding
-import com.mk.diary.databinding.HomeRecyclerItemviewImagesRecBinding
-import com.mk.diary.domain.models.ImageItem
-import com.mk.diary.domain.models.NoteViewModelClass
-import com.mk.mydiary.utils.MyConstants
+import my.dialy.dairy.journal.dairywithlock.databinding.HomeRecyclerItemviewImagesRecBinding
 
 class HomeFragmentNoteViewItemViewRecyclerAdapter(private val modelList: ArrayList<String>) :
     RecyclerView.Adapter<HomeFragmentNoteViewItemViewRecyclerAdapter.ViewHolder>() {
@@ -29,7 +20,7 @@ class HomeFragmentNoteViewItemViewRecyclerAdapter(private val modelList: ArrayLi
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =HomeRecyclerItemviewImagesRecBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = HomeRecyclerItemviewImagesRecBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

@@ -7,10 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.mk.diary.R
-import com.mk.diary.databinding.FragmentImageViewDetailsBinding
-import com.mk.mydiary.utils.MyConstants
-import com.mk.mydiary.utils.companion.Static
+import com.mk.diary.utils.MyConstants
+import com.mk.diary.utils.companion.Static
+import my.dialy.dairy.journal.dairywithlock.databinding.FragmentImageViewDetailsBinding
 
 
 class ImageViewDetailsFragment : Fragment() {
@@ -20,7 +19,7 @@ class ImageViewDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding= FragmentImageViewDetailsBinding.inflate(layoutInflater,container,false)
-        var imageUri=arguments?.getInt(MyConstants.PASS_DATA)
+        var imageUri=arguments?.getString(MyConstants.PASS_DATA)
         if (imageUri!=null){
             Glide.with(requireContext()).load(imageUri).into(binding.imageView)
         }

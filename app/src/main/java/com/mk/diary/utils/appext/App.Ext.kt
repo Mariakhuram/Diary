@@ -1,8 +1,9 @@
-package com.mk.mydiary.utils.appext
+package com.mk.diary.utils.appext
 
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 
 fun Context.shortToast(m:String){
     Toast.makeText(this, m, Toast.LENGTH_SHORT).show()

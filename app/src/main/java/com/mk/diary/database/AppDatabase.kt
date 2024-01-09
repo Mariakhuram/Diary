@@ -13,10 +13,10 @@ import javax.inject.Provider
 
 @Database(
     entities = [NoteViewModelClass::class],
-    version = 4,
+    version = 1,
     exportSchema = false
 )
-@TypeConverters(StringArrayListConverter::class)
+@TypeConverters(StringArrayListConverter::class,VoiceRecordingModelClassConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     // record dao
@@ -36,3 +36,4 @@ abstract class AppDatabase : RoomDatabase() {
     }
 
 }
+

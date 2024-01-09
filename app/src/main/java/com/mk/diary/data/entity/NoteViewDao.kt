@@ -11,11 +11,14 @@ import com.mk.diary.domain.models.NoteViewModelClass
 
 @Dao
 interface NoteViewDao {
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertData(model: NoteViewModelClass)
 
     @Update
     suspend fun updateData(model: NoteViewModelClass)
+
 
     @Delete
     suspend fun deleteData(model: NoteViewModelClass)

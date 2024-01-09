@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/border_background.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/white" /> <!-- Yellow color -->
+        </shape>
+    </item>
+    <item
+        android:id="@+id/strokeColor"
+        android:right="0dp" android:left="0dp" android:top="0dp" android:bottom="0dp">
+        <shape android:shape="oval">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="@dimen/_2sdp"
+                android:color="@color/pinkButtonColor" /> <!-- Red border color, adjust as needed -->
+        </shape>
+    </item>
+</layer-list>

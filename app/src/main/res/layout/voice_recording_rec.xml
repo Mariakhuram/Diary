@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_36sdp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginTop="@dimen/_10sdp"
+    android:layout_marginStart="@dimen/_4sdp"
+    android:layout_marginEnd="@dimen/_4sdp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:background="@drawable/rounded_corners_shape"
+        android:backgroundTint="@color/smoothBack"
+        app:layout_constraintStart_toStartOf="@+id/ImageViewLayout"
+        app:layout_constraintTop_toBottomOf="@+id/ImageViewLayout">
+        <ImageView
+            android:id="@+id/playPauseBtn"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:src="@drawable/playvoiceicone"
+            app:tint="@color/unselected_State_Color"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+    <TextView
+        android:id="@+id/voiceName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:maxLines="1"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:gravity="start"
+        android:textSize="@dimen/_10ssp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="@id/playPauseBtn"
+        app:layout_constraintEnd_toStartOf="@+id/voiceDuration"
+        app:layout_constraintStart_toEndOf="@+id/playPauseBtn"
+        app:layout_constraintTop_toTopOf="@id/playPauseBtn" />
+
+    <TextView
+        android:id="@+id/voiceDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Nov 2023"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_10ssp"
+        android:textStyle="normal"
+        android:layout_marginEnd="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="@id/playPauseBtn"
+        app:layout_constraintEnd_toStartOf="@+id/voiceDeleteBtn"
+        app:layout_constraintTop_toTopOf="@id/playPauseBtn" />
+
+        <ImageView
+            android:id="@+id/voiceDeleteBtn"
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            app:tint="@color/unselected_State_Color"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:src="@drawable/deleteicone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+

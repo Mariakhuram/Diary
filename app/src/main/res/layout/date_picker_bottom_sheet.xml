@@ -11,7 +11,8 @@
         android:layout_height="@dimen/_22sdp"
         app:cardCornerRadius="@dimen/_11sdp"
         android:layout_marginEnd="@dimen/_2sdp"
-        app:cardElevation="@dimen/_4sdp"
+        android:layout_margin="@dimen/_4sdp"
+        app:cardElevation="@dimen/_2sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         <ImageView
@@ -63,6 +64,7 @@
         android:id="@+id/saveBtn"
         android:textColor="@color/white"
         android:textSize="@dimen/_14ssp"
+        android:layout_marginStart="@dimen/_4sdp"
         android:gravity="center"
         android:fontFamily="@font/baloo_bhai_2_semibold"
         android:background="@drawable/rounded_corners_shape"/>

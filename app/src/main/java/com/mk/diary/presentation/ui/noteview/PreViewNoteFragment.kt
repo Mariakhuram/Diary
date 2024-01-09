@@ -1,47 +1,39 @@
 package com.mk.diary.presentation.ui.noteview
 
 import android.graphics.Typeface
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.style.BackgroundColorSpan
-import android.text.style.BulletSpan
 import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.mk.diary.R
-import com.mk.diary.adapters.recyclerview.HashTagRecyclerAdapter
 import com.mk.diary.adapters.recyclerview.TagTitleRecyclerAdapter
-import com.mk.diary.databinding.FragmentPreViewNoteBinding
+import com.mk.diary.adapters.recyclerview.VoiceRecodingRecAdapter
 import com.mk.diary.domain.models.NoteViewModelClass
-import com.mk.diary.helpers.ResultCase
+import com.mk.diary.domain.models.VoiceRecordingModelClass
 import com.mk.diary.presentation.viewmodels.playing.VoicePlayingViewModel
 import com.mk.diary.utils.fonts.FontTextSize
-import com.mk.mydiary.utils.MyConstants
-import com.mk.mydiary.utils.SharedPrefObj
-import com.mk.mydiary.utils.appext.shortToast
+import com.mk.diary.utils.MyConstants
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import java.io.IOException
+import my.dialy.dairy.journal.dairywithlock.R
+import my.dialy.dairy.journal.dairywithlock.databinding.FragmentPreViewNoteBinding
 
 @AndroidEntryPoint
 class PreViewNoteFragment : FontTextSize() {
     private val listOfTextViews :ArrayList<TextView> by lazy { ArrayList() }
     private lateinit var allerTypeface: Typeface
     var checkPlayPause = false
-    private val voicePlayer : VoicePlayingViewModel by viewModels()
+    private val voicePlayViewModel :VoicePlayingViewModel by viewModels()
+    private val voiceModelList :ArrayList<VoiceRecordingModelClass> by  lazy { ArrayList() }
+    private val mVoiceRecAdapter by lazy { VoiceRecodingRecAdapter(voiceModelList) }
     private val listOfImages :ArrayList<String> by lazy { ArrayList() }
     private val listOfTags :ArrayList<String> by lazy { ArrayList() }
     private lateinit var mAdapter : TagTitleRecyclerAdapter
@@ -50,7 +42,6 @@ class PreViewNoteFragment : FontTextSize() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         binding = FragmentPreViewNoteBinding.inflate(layoutInflater, container, false)
         val receivedObject =arguments?.getSerializable(MyConstants.PASS_DATA) as NoteViewModelClass
         binding.backBtn.setOnClickListener {
@@ -60,14 +51,41 @@ class PreViewNoteFragment : FontTextSize() {
             val image = receivedObject.listOfImages[index]
             listOfImages.add(image)
         }
-        for (index in receivedObject?.tagTitle?.indices!!) {
-            val image = receivedObject.tagTitle[index]
-            listOfTags.add(image)
+        if (receivedObject.tagTitle.size>0){
+            receivedObject.tagTitle.remove("#")
+            for (index in receivedObject?.tagTitle?.indices!!) {
+                val image = receivedObject.tagTitle[index]
+                listOfTags.add("#$image")
+            }
         }
+        voiceRecyclerView()
         setRecycler()
         backButton()
         setupPreview(receivedObject)
         return binding.root
+    }
+    private fun voiceRecyclerView() {
+        binding.voiceRec.adapter=mVoiceRecAdapter
+        mVoiceRecAdapter.recyclerClick(object:VoiceRecodingRecAdapter.PassData{
+            override fun clickFunction(modelClass: VoiceRecordingModelClass, position: Int,imageView: ImageView) {
+                if (!checkPlayPause){
+                    modelClass.voicePath?.let {
+                        voicePlayViewModel.playVoice(requireContext(),
+                            it,imageView)
+                    }
+                    checkPlayPause = true
+                    imageView.setImageResource(R.drawable.pause_icone)
+                }else{
+                    checkPlayPause = false
+                    voicePlayViewModel.pauseVoice()
+                    imageView.setImageResource(R.drawable.playvoiceicone)
+                }
+            }
+            override fun deleteFunction(modelClass: VoiceRecordingModelClass) {
+
+            }
+
+        })
     }
 
     private fun backButton() {
@@ -151,7 +169,6 @@ class PreViewNoteFragment : FontTextSize() {
                     binding.descriptionEd.text=spannable
                 }
             }
-            Log.d("Span",  "Copied ${copiedText}   Edited $editTextText  Span ${spannable}")
         }else if (modelClass.description!=null){
             binding.descriptionEd.visibility=View.VISIBLE
             binding.descriptionEd.text = modelClass.description
@@ -174,21 +191,16 @@ class PreViewNoteFragment : FontTextSize() {
                 modelClass.textColor!!,listOfTextViews)
         }
         if (modelClass.backgroundTheme!=null){
-            binding.backGround.setBackgroundResource(modelClass.backgroundTheme!!)
+
+            Glide.with(requireContext()).load(modelClass.backgroundTheme).into(binding.backGround)
         }
         if (modelClass.voice!=null) {
-            binding.voiceLayout.visibility=View.VISIBLE
-            binding.voiceDuration.text=modelClass.voiceDuration
-            binding.playPauseBtn.setOnClickListener {
-                if (!checkPlayPause) {
-                    modelClass.voice?.let { it1 ->voicePlayer.playVoice(requireContext(),modelClass.voice!!,binding.playPauseBtn)}
-                    binding.playPauseBtn.setImageResource(R.drawable.pause_icone)
-                    checkPlayPause = true
-                } else {
-                    voicePlayer.pauseVoice()
-                    binding.playPauseBtn.setImageResource(R.drawable.next_arrow)
-                    checkPlayPause = false
-                }
+            voiceModelList.clear()
+            for (m in modelClass.voice){
+                voiceModelList.add(VoiceRecordingModelClass(m.voiceName,m.voicePath, m.duration))
+                mVoiceRecAdapter.notifyDataSetChanged()
+                binding.voiceLayout.visibility = View.VISIBLE
+                binding.voiceLayout.visibility=View.VISIBLE
             }
         }
     }

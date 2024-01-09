@@ -1,15 +1,20 @@
-package com.mk.mydiary.utils
+package com.mk.diary.utils
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.mk.diary.R
+import com.mk.diary.helpers.AppThemeModelClass
+import my.dialy.dairy.journal.dairywithlock.R
 
 
 object SharedPrefObj {
-    const val URI_LIST = "uri_list"
-    const val USER_TOKEN = "uskjkljljer_token"
+    private const val PASSWORD_KEY="PASSWORD_KEY"
+    private const val URI_LIST = "uri_list"
+    private const val USER_TOKEN = "USER_TOKEN_token"
+    private const val EMAIL_KEY = "email_key"
+    private const val APP_THEME_COLOR_VALUE="APP_THEME_COLOR_VALUE"
+    private const val APP_THEME_IMAGE_VALUE="APP_THEME_IMAGE_VALUE"
     fun saveAuthToken(context: Context, token: String) {
         saveString(context, USER_TOKEN, token)
     }
@@ -18,20 +23,20 @@ object SharedPrefObj {
     }
     fun saveString(context: Context, key: String, value: String) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
         editor.putString(key, value)
         editor.apply()
     }
     fun removeString(context: Context, key: String) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
         editor.remove(key)
         editor.apply()
     }
     fun saveUriList(context: Context, uriList: List<String>) {
-        val prefs: SharedPreferences = context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
 
         // Convert the list to a JSON string before saving
@@ -43,7 +48,7 @@ object SharedPrefObj {
 
     // Retrieve a list of URIs from SharedPreferences
     fun getUriList(context: Context): ArrayList<String> {
-        val prefs: SharedPreferences = context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+        val prefs: SharedPreferences = context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
 
         // Retrieve the JSON string and convert it back to a list
         val uriListJson = prefs.getString(URI_LIST, null)
@@ -73,19 +78,19 @@ object SharedPrefObj {
     }
     fun getString(context: Context, key: String): String? {
         val prefs: SharedPreferences =
-            context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         return prefs.getString(key, null)
     }
     fun saveBoolean(context: Context, key: String, value: Boolean) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
         editor.putBoolean(key, value)
         editor.apply()
     }
     fun removeBoolean(context: Context, key: String) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         val editor = prefs.edit()
         editor.remove(key)
         editor.apply()
@@ -93,17 +98,18 @@ object SharedPrefObj {
 
     fun getBoolean(context: Context, key: String, defaultValue: Boolean): Boolean {
         val prefs: SharedPreferences =
-            context.getSharedPreferences("adfasd", Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         return prefs.getBoolean(key, defaultValue)
     }
     fun clearData(context: Context){
-        val editor = context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE).edit()
+        val editor =  context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE).edit()
         editor.clear()
         editor.apply()
     }
     fun saveInt(context: Context, key: String, value: Int) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+
         val editor = prefs.edit()
         editor.putInt(key, value)
         editor.apply()
@@ -111,7 +117,8 @@ object SharedPrefObj {
 
     fun removeInt(context: Context, key: String) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+
         val editor = prefs.edit()
         editor.remove(key)
         editor.apply()
@@ -119,12 +126,14 @@ object SharedPrefObj {
 
     fun getInt(context: Context, key: String, defaultValue: Int): Int {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+
         return prefs.getInt(key, defaultValue)
     }
     fun saveFloat(context: Context, key: String, value: Float) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+
         val editor = prefs.edit()
         editor.putFloat(key, value)
         editor.apply()
@@ -132,15 +141,75 @@ object SharedPrefObj {
 
     fun removeFloat(context: Context, key: String) {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+
         val editor = prefs.edit()
         editor.remove(key)
         editor.apply()
     }
-
     fun getFloat(context: Context, key: String, defaultValue: Float): Float {
         val prefs: SharedPreferences =
-            context.getSharedPreferences(context.getString(R.string.app_name), Context.MODE_PRIVATE)
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
         return prefs.getFloat(key, defaultValue)
+    }
+    fun savePasswordList(context: Context, value: List<String>) {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+
+        val editor = prefs.edit()
+        val gson = Gson()
+        val json = gson.toJson(value)
+        editor.putString(PASSWORD_KEY, json)
+        editor.apply()
+    }
+
+    fun removePasswordList(context: Context) {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.remove(PASSWORD_KEY)
+        editor.apply()
+    }
+
+    fun getPasswordList(context: Context): List<String>? {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val json = prefs.getString(PASSWORD_KEY, null)
+        val type = object : TypeToken<List<String>>() {}.type
+        return gson.fromJson(json, type)
+    }
+    fun saveEmail(context: Context, email: String) {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putString(EMAIL_KEY, email)
+        editor.apply()
+    }
+    fun removeEmail(context: Context) {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.remove(EMAIL_KEY)
+        editor.apply()
+    }
+
+    fun getEmail(context: Context): String? {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        return prefs.getString(EMAIL_KEY, null)
+    }
+    fun saveAppTheme(context: Context,model: AppThemeModelClass){
+        val prefs: SharedPreferences =  context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putInt(APP_THEME_COLOR_VALUE, model.color)
+        editor.putString(APP_THEME_IMAGE_VALUE, model.theme)
+        editor.apply()
+    }
+    fun getAppTheme(context: Context): AppThemeModelClass {
+        val prefs: SharedPreferences = context.getSharedPreferences("CalculatorPrefs", Context.MODE_PRIVATE)
+        val model=AppThemeModelClass(prefs.getInt(APP_THEME_COLOR_VALUE, context.resources.getColor(R.color.pinkButtonColor)),prefs.getString(
+           APP_THEME_IMAGE_VALUE,null))
+        return model
     }
 }

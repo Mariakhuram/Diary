@@ -1,22 +1,12 @@
 package com.mk.diary.utils.fonts
 
-import android.text.Editable
 import android.text.InputFilter
-import android.text.InputType
 import android.text.Spanned
-import android.text.TextWatcher
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.core.text.toHtml
-import androidx.core.widget.addTextChangedListener
-import com.mk.diary.databinding.FragmentCreateNoteBinding
-import com.mk.mydiary.utils.MyConstants
-import com.mk.mydiary.utils.fonts.FontFamily
+import com.mk.diary.utils.MyConstants
 
-open class FontTextSize:FontFamily() {
+open class FontTextSize: FontFamily() {
 
     fun setupTextSizeOnViews(
         textSize: Float,
@@ -84,13 +74,13 @@ open class FontTextSize:FontFamily() {
     }
 
     fun setupTextLettersCustomizationOnViews(
-        checkKey:Boolean,
+        checkKey:String,
         textViews: ArrayList<TextView>? = null,
         editTexts: ArrayList<EditText>? = null
     ) {
         try {
             when(checkKey){
-                true->{
+                MyConstants.ALL_CAPITAL->{
                     textViews?.forEach { it.isAllCaps=true }
                     editTexts?.get(0)?.filters = arrayOf(object : InputFilter.AllCaps() {
                         override fun filter(
@@ -117,7 +107,34 @@ open class FontTextSize:FontFamily() {
                         }
                     })
                 }
-                false-> {
+                MyConstants.ALL_SMALL-> {
+                    textViews?.forEach { it.isAllCaps = false }
+                    editTexts?.get(0)?.filters = arrayOf(object : InputFilter.AllCaps() {
+                        override fun filter(
+                            source: CharSequence?,
+                            start: Int,
+                            end: Int,
+                            dest: Spanned?,
+                            dstart: Int,
+                            dend: Int
+                        ): CharSequence {
+                            return source?.toString()?.toLowerCase() ?: ""
+                        }
+                    })
+                    editTexts?.get(1)?.filters = arrayOf(object : InputFilter.AllCaps() {
+                        override fun filter(
+                            source: CharSequence?,
+                            start: Int,
+                            end: Int,
+                            dest: Spanned?,
+                            dstart: Int,
+                            dend: Int
+                        ): CharSequence {
+                            return source?.toString()?.toLowerCase() ?: ""
+                        }
+                    })
+                }
+                MyConstants.ALL_DEFAULT->{
                     textViews?.forEach { it.isAllCaps = false }
                     editTexts?.get(0)?.filters = arrayOf(object : InputFilter.AllCaps() {
                         override fun filter(

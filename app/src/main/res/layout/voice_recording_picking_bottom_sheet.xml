@@ -59,7 +59,7 @@
         android:id="@+id/cancelBtn"
         app:cardElevation="@dimen/_2sdp"
         android:layout_marginTop="@dimen/_20sdp"
-        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginStart="@dimen/_20sdp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent">
         <ImageView
@@ -85,7 +85,7 @@
         android:id="@+id/saveBtn"
         android:layout_width="@dimen/_50sdp"
         android:layout_height="@dimen/_25sdp"
-        android:layout_marginEnd="@dimen/_12sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
         app:cardCornerRadius="@dimen/_11sdp"
         app:cardElevation="@dimen/_2sdp"
         app:layout_constraintBottom_toBottomOf="@+id/cancelBtn"
@@ -151,10 +151,9 @@
         android:layout_marginTop="@dimen/_15sdp"
         android:background="@drawable/pick_audio_back"
         android:padding="@dimen/_16sdp"
-        android:layout_marginEnd="@dimen/_12sdp"
         android:src="@drawable/pick_audio_icone"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="@dimen/_4sdp"
+        app:layout_constraintEnd_toEndOf="@id/saveBtn"
+        android:layout_marginStart="@dimen/_6sdp"
         app:layout_constraintStart_toStartOf="@id/gCenter"
         app:layout_constraintTop_toBottomOf="@id/saveBtn" />
 

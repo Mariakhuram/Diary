@@ -2,6 +2,7 @@ package com.mk.diary.presentation.ui.noteview
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -21,12 +22,12 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.text.style.BackgroundColorSpan
-import android.text.style.BulletSpan
 import android.text.style.UnderlineSpan
 import android.util.Base64
 import android.util.Log
@@ -45,6 +46,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.emoji2.emojipicker.EmojiPickerView
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -54,32 +56,37 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.mk.diary.R
 import com.mk.diary.adapters.recyclerview.CreateNoteImageRecyclerAdapter
+import com.mk.diary.adapters.recyclerview.FontColorBottomSheetRecAdapter
 import com.mk.diary.adapters.recyclerview.GalleryImagePickerRecAdapter
 import com.mk.diary.adapters.recyclerview.HashTagRecyclerAdapter
+import com.mk.diary.adapters.recyclerview.VoiceRecodingRecAdapter
 import com.mk.diary.adapters.tabslayout.BackgroundThemeTabLayoutAdapter
-import com.mk.diary.databinding.FragmentCreateNoteBinding
 import com.mk.diary.domain.models.ImageItem
 import com.mk.diary.domain.models.NoteViewModelClass
+import com.mk.diary.domain.models.VoiceRecordingModelClass
 import com.mk.diary.helpers.ResultCase
 import com.mk.diary.helpers.VoiceRecorderHelper
+
+import com.mk.diary.presentation.ui.tabs.BottomNavActivity
+import com.mk.diary.presentation.viewmodels.coordinator.CoordinatorViewModel
 import com.mk.diary.presentation.viewmodels.noteview.NoteViewModel
 import com.mk.diary.presentation.viewmodels.playing.VoicePlayingViewModel
 import com.mk.diary.presentation.viewmodels.recoding.VoiceRecordingViewModel
 import com.mk.diary.utils.fonts.FontTextSize
-import com.mk.mydiary.utils.MyConstants
-import com.mk.mydiary.utils.SharedPrefObj
-import com.mk.mydiary.utils.appext.longToast
-import com.mk.mydiary.utils.appext.shortToast
-import com.mk.mydiary.utils.companion.CurrentTime
-import com.mk.mydiary.utils.companion.Static
+import com.mk.diary.utils.MyConstants
+import com.mk.diary.utils.SharedPrefObj
+import com.mk.diary.utils.appext.newScreen
+import com.mk.diary.utils.appext.shortToast
+import com.mk.diary.utils.companion.CurrentTime
+import com.mk.diary.utils.companion.Static
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import my.dialy.dairy.journal.dairywithlock.R
+import my.dialy.dairy.journal.dairywithlock.databinding.FragmentCreateNoteBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -88,26 +95,27 @@ import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 @AndroidEntryPoint
 class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
+    private val voiceModelList :ArrayList<VoiceRecordingModelClass> by  lazy { ArrayList() }
+    private val mVoiceRecAdapter by lazy { VoiceRecodingRecAdapter(voiceModelList) }
+    private val voicePathList :ArrayList<String> by  lazy { ArrayList() }
+    private val voiceDurationList :ArrayList<String> by  lazy { ArrayList() }
     val viewModel: NoteViewModel by viewModels()
-    var checkClick = false
-    val voicePlayViewModel: VoicePlayingViewModel by viewModels()
-    val voiceRecordingViewModel: VoiceRecordingViewModel by viewModels()
-    val scope = MainScope()
+    private val splashDuration: Long = 2000 // 2 seconds
+    private var checkClick = false
+    private val voicePlayViewModel: VoicePlayingViewModel by viewModels()
+    private val voiceRecordingViewModel: VoiceRecordingViewModel by viewModels()
     private var seconds = 0
     private val createNoteModelList :ArrayList<String> by lazy { ArrayList()}
     private val mCreateNoteImagesAdapter by lazy { CreateNoteImageRecyclerAdapter(createNoteModelList) }
     lateinit var durationTextView: TextView
     private lateinit var handler: Handler
     private lateinit var runnable: Runnable
-    private val linesList :ArrayList<String> by lazy { ArrayList() }
-    private val listOfSelectedImages :ArrayList<String> by lazy { ArrayList() }
     private val hashTagList: ArrayList<String> by lazy { ArrayList() }
+    private val hashTagListCheckResume: ArrayList<String> by lazy { ArrayList() }
     private val hashTagRecyclerAdapter by lazy { HashTagRecyclerAdapter(hashTagList) }
     private val listOfTextView: ArrayList<TextView> by lazy { ArrayList() }
     private val listOfEditTexts: ArrayList<EditText> by lazy { ArrayList() }
@@ -124,51 +132,141 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     private var REQUEST_CODE_PERMISSIONS_ANDROID_11 = 32423
     private var REQUEST_CODE_PERMISSIONS_ANDROID_6 = 323421
     private var formattedDuration: String? = null
-    private var key: String? = null
-    private var audio_File: File? = null
     private var audioFilePath: String? = null
-    private var updated: String? = null
     private var checkPlayPause = false
     private var checkSaveBtn = false
+    private var addedVoiceByRecording = true
     private var checkRecording = false
+    private var capitalLargeLetters = false
+    private var smallLargeLetters = false
+    private var digitsButton = false
+    private var dotsButtonCLick = false
     private lateinit var clipboardManager: ClipboardManager
-    var checkBulletsStyleClick = false
-    var counter = 0
+    private var checkBulletsStyleClick = false
+    var counter = 1
     var gravity:Int?=null
     var dayOfWeek:String?=null
     var date:String?=null
     var month:String?=null
     var year:String?=null
     var voice:String?=null
-    var imageUri:String?=null
+    private var voiceName:String?=null
+    private var imageUri:String?=null
     var position:Int?=null
-    var backGroundImage:Int?=null
-    var status:Int?=null
+    private var backGroundImage:String?=null
+    private var status:Int?=null
     var textSize:Float?=null
     var textColor:Int?=null
     var emoji:String?=null
     var fontFamily:String?=null
-    var capitalization:String?=null
-    var bulletStyle:String?=null
+    private var capitalization:String?=null
+    private var bulletStyle:String?=null
     var title:String?=null
     var deleteImageViewItem :String?=null
     var description:String?=null
-    var durationOfVoice:String?=null
-
+    private var durationOfVoice:String?=null
+    private val coordinatorViewModel: CoordinatorViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         binding = FragmentCreateNoteBinding.inflate(layoutInflater, container, false)
         Static.checkBolean = false
         dateView()
         setUpImagesAccordingtoSelection()
         askPermissionsForAll()
-        setupAudio()
-        hashTagRecycler()
         setupListsForTextSize()
-        selectedImageViewClicks()
+        galleryImagesRecycler()
+        setupPreView()
+        observeRecordingState()
+        saveNoteViewDataSetup()
+        clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        customBottomBarClickEvents()
+        coordinatorViewModel.liveData.observe(viewLifecycleOwner) { data ->
+            backGroundImage = data
+            Glide.with(requireContext()).load(data).into(binding.backGround)
+        }
+        binding.removeHas.setOnClickListener {
+            Static.removehashTagBoolean = true
+            hashTagRecyclerAdapter.notifyDataSetChanged()
+        }
+        isUserForFirstTimeShowTips()
+        hashTagRecycler()
+        if (textColor!=null){
+            textColor?.let { color(it) }
+        }
+        voiceRecyclerView()
+        return binding.root
+    }
+
+    private fun isUserForFirstTimeShowTips() {
+        if (SharedPrefObj.getString(requireContext(), MyConstants.USER_TIPS).isNullOrEmpty()){
+            binding.tipAnimationBtn.visibility=View.VISIBLE
+            binding.bottomBar.visibility=View.INVISIBLE
+            binding.preViewBtn.visibility=View.INVISIBLE
+            binding.tipAnimLayout.backText.visibility=View.INVISIBLE
+        }else{
+            checkUserStatus()
+            binding.tipAnimationBtn.visibility=View.GONE
+        }
+        binding.tipAnimLayout.tipOne.setOnClickListener {
+            binding.tipAnimLayout.tipOne.visibility=View.GONE
+            binding.tipAnimLayout.tipOneText.visibility=View.GONE
+            binding.tipAnimLayout.tipOneImg.visibility=View.GONE
+            binding.tipAnimLayout.tipTwo.visibility=View.VISIBLE
+            binding.tipAnimLayout.tipTwoImg.visibility=View.VISIBLE
+            binding.tipAnimLayout.tipTwoText.visibility=View.VISIBLE
+            binding.tipAnimLayout.tipThree.visibility=View.GONE
+            binding.tipAnimLayout.tipThreeImg.visibility=View.GONE
+            binding.tipAnimLayout.tipThreeText.visibility=View.GONE
+            binding.tipAnimLayout.backText.visibility=View.VISIBLE
+        }
+        binding.tipAnimLayout.tipTwo.setOnClickListener {
+            binding.tipAnimLayout.tipOne.visibility=View.GONE
+            binding.tipAnimLayout.tipOneText.visibility=View.GONE
+            binding.tipAnimLayout.tipOneImg.visibility=View.GONE
+            binding.tipAnimLayout.tipTwo.visibility=View.GONE
+            binding.tipAnimLayout.tipTwoImg.visibility=View.GONE
+            binding.tipAnimLayout.tipTwoText.visibility=View.GONE
+            binding.tipAnimLayout.tipThree.visibility=View.VISIBLE
+            binding.tipAnimLayout.tipThreeImg.visibility=View.VISIBLE
+            binding.tipAnimLayout.tipThreeText.visibility=View.VISIBLE
+        }
+        binding.tipAnimLayout.tipThree.setOnClickListener {
+            binding.tipAnimationBtn.visibility=View.GONE
+            binding.bottomBar.visibility=View.VISIBLE
+            binding.preViewBtn.visibility=View.VISIBLE
+            SharedPrefObj.saveString(requireContext(), MyConstants.USER_TIPS,"USER_TIPS")
+        }
+
+    }
+
+    private fun voiceRecyclerView() {
+        binding.voiceRec.adapter=mVoiceRecAdapter
+        mVoiceRecAdapter.recyclerClick(object:VoiceRecodingRecAdapter.PassData{
+            override fun clickFunction(modelClass: VoiceRecordingModelClass, position: Int,imageView: ImageView) {
+                if (!checkPlayPause){
+                    modelClass.voicePath?.let {
+                        voicePlayViewModel.playVoice(requireContext(),
+                            it,imageView)
+                    }
+                    checkPlayPause = true
+                    imageView.setImageResource(R.drawable.pause_icone)
+                }else{
+                    checkPlayPause = false
+                    voicePlayViewModel.pauseVoice()
+                    imageView.setImageResource(R.drawable.playvoiceicone)
+                }
+            }
+            override fun deleteFunction(modelClass: VoiceRecordingModelClass) {
+                voiceModelList.remove(modelClass)
+                mVoiceRecAdapter.notifyDataSetChanged()
+            }
+
+        })
+    }
+
+    private fun galleryImagesRecycler() {
         binding.createNoteRec.adapter=mCreateNoteImagesAdapter
         mCreateNoteImagesAdapter.recyclerClick(object :CreateNoteImageRecyclerAdapter.PassRateData{
             override fun clickFunction(modelClass: String) {
@@ -184,28 +282,27 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 mCreateNoteImagesAdapter.notifyDataSetChanged()
             }
         })
-        removeImagesAccordingToPositions()
-        playPauseAudio()
-        setupPreView()
-        observeRecordingState()
-        saveNoteViewDataSetup()
-        clipboardManager = requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        customBottomBarClickEvents()
-        checkUserStatus()
-        return binding.root
     }
-
     override fun onResume() {
         super.onResume()
         if (backGroundImage!=null){
-            binding.backGround.setBackgroundResource(backGroundImage!!)
+            Glide.with(requireContext()).load(backGroundImage).into(binding.backGround)
         }
-        if (voice!=null){
+        if (voiceModelList.isNotEmpty()){
             binding.voiceLayout.visibility=View.VISIBLE
-            binding.voiceDuration.text=formattedDuration
+        }
+        if (fontFamily!=null){
+            allerTypeface = Typeface.createFromAsset(requireActivity().assets, fontFamily)
+            setupCustomFonts(allerTypeface, listOfTextView, listOfEditTexts)
         }
         if (hashTagList.isNotEmpty()){
-            binding.hashTagLayout.visibility=View.VISIBLE
+                hashTagRecyclerAdapter.notifyDataSetChanged()
+                Log.d("hashTagList", "saveDataBottomSheet: size${hashTagList.size} "+hashTagList )
+                binding.hashTagLayout.visibility=View.VISIBLE
+            }
+        if (hashTagList.contains("#")){
+        }else{
+            hashTagList.add("#")
         }
         if(status!=null){
             binding.noteViewStatusImage.setImageResource(status!!)
@@ -217,22 +314,28 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             mCreateNoteImagesAdapter.notifyDataSetChanged()
         }
         gravity?.let { setGravityOnView(it) }
+        hashTagRecyclerAdapter.notifyDataSetChanged()
+
     }
     private fun hashTagRecycler() {
-        hashTagList.add("#")
+
         binding.recyclerTagLayout.adapter = hashTagRecyclerAdapter
         hashTagRecyclerAdapter.hashRecClick(object :HashTagRecyclerAdapter.HashTagItemClick{
             override fun hashTagClick(data: String) {
                 hashTagList.add(data)
+                hashTagListCheckResume.add(data)
                 hashTagRecyclerAdapter.notifyDataSetChanged()
             }
             override fun hashTagDelete(data: String) {
                 hashTagList.remove(data)
+                hashTagListCheckResume.remove(data)
+                hashTagRecyclerAdapter.notifyDataSetChanged()
             }
         })
     }
     private fun setupPreView() {
         binding.preViewBtn.setOnClickListener {
+            Log.d("hashTagListFirdt", "saveDataBottomSheetand ${hashTagList.size}: "+hashTagList)
             val mainTitle = binding.titleEd.text.toString()
             val mainDescription = binding.descriptionEd.text.toString()
             val model = NoteViewModelClass(
@@ -242,14 +345,14 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 date,
                 year,
                 month,
-                listOfSelectedImages,
-                voice,
-                formattedDuration,
+                createNoteModelList,
+                voiceModelList,
+                voiceDurationList,
                 mainTitle,
                 mainDescription,
                 selectedTextForUnderLine,
                 selectedTextForHighLighting,
-                hashTagList,
+                hashTagListCheckResume,
                 status,
                 backGroundImage,
                 fontFamily,
@@ -257,25 +360,32 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 textSize,
                 textColor,
                 gravity,
-                linesList
             )
             val bundle = Bundle()
             bundle.putSerializable(MyConstants.PASS_DATA,model)
             findNavController().navigate(R.id.action_createNoteFragment_to_preViewNoteFragment,bundle)
         }
     }
-
     private fun saveDataBottomSheet() {
         val dialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme)
         val view = layoutInflater.inflate(R.layout.dontsave_noteview_bottom_sheet, null)
         val cancelBtn = view.findViewById<ConstraintLayout>(R.id.cancelBtn)
-        val saveBtn = view.findViewById<ConstraintLayout>(R.id.deleteBtn)
+        val saveBtn = view.findViewById<CardView>(R.id.deleteBtn)
+        val notsStatus = view.findViewById<ImageView>(R.id.statusImageview)
+        val theme= SharedPrefObj.getAppTheme(requireContext())
+        saveBtn.setCardBackgroundColor(theme.color)
+        if (!checkSaveBtn){
+            notsStatus.setImageResource(R.drawable.emojifive)
+        }
         // Connect TabLayout and ViewPager2
         cancelBtn.setOnClickListener {
             // Handle the cancel button click
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         saveBtn.setOnClickListener {
+            binding.bottomBar.visibility=View.GONE
+            binding.preViewBtn.visibility=View.GONE
+            binding.saveNoteAnimation.visibility=View.VISIBLE
             val mainTitle = binding.titleEd.text.toString()
             val mainDescription = binding.descriptionEd.text.toString()
             val model = NoteViewModelClass(
@@ -285,9 +395,9 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 date,
                 year,
                 month,
-                listOfSelectedImages,
-                voice,
-                formattedDuration,
+                createNoteModelList,
+                voiceModelList,
+                voiceDurationList,
                 mainTitle,
                 mainDescription,
                 selectedTextForUnderLine,
@@ -300,14 +410,12 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 textSize,
                 textColor,
                 gravity,
-                linesList
             )
             lifecycleScope.launch {
                 when (val result = viewModel.saveData(model)) {
                     is ResultCase.Success -> {
                         // Handle success, if needed
                         if (checkClick) {
-                            requireContext().shortToast("Saved")
                             title = null
                             description = null
                             textSize = null
@@ -318,13 +426,19 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                             capitalization = null
                             fontFamily = null
                             backGroundImage=null
-                            listOfSelectedImages.clear()
                             binding.descriptionEd.setText("")
                             binding.titleEd.setText("")
+                            MyConstants.list.clear()
+                            MyConstants.listOfImageCounting.clear()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(splashDuration)
+                                binding.saveNoteAnimation.visibility=View.GONE
+                                binding.bottomBar.visibility=View.VISIBLE
+                                binding.preViewBtn.visibility=View.VISIBLE
+                                requireContext().newScreen(BottomNavActivity::class.java)
+                            }
                             dialog.dismiss()
-                            findNavController().popBackStack()
                         } else {
-                            requireContext().shortToast("Saved")
                             title = null
                             description = null
                             textSize = null
@@ -335,20 +449,27 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                             capitalization = null
                             fontFamily = null
                             backGroundImage
-                            MyConstants.list
-                            MyConstants.listOfImageCounting
-                            SharedPrefObj.removeInt(requireContext(), MyConstants.FONTS_KEY)
+                            MyConstants.list.clear()
+                            MyConstants.listOfImageCounting.clear()
                             binding.descriptionEd.setText("")
                             binding.titleEd.setText("")
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(splashDuration)
+                                binding.bottomBar.visibility=View.VISIBLE
+                                binding.preViewBtn.visibility=View.VISIBLE
+                                binding.saveNoteAnimation.visibility=View.GONE
+                                requireContext().newScreen(BottomNavActivity::class.java)
+                            }
                             dialog.dismiss()
                         }
                     }
 
                     is ResultCase.Error -> {
+                        MyConstants.list.clear()
+                        MyConstants.listOfImageCounting.clear()
                         // Handle error
                         requireContext().shortToast(result.message.toString())
                     }
-
                     else -> {
                     }
                 }
@@ -371,7 +492,6 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     }
     private fun saveNoteViewDataSetup() {
         binding.saveNoteViewBtn.setOnClickListener {
-
             checkSaveBtn = true
             saveDataBottomSheet()
         }
@@ -446,17 +566,13 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         )
         val pickAudioAccess =
             ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
-        val pickImageAccess = ActivityCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-        if (readExternalStorageAccess == PackageManager.PERMISSION_DENIED || pickAudioAccess == PackageManager.PERMISSION_DENIED || pickImageAccess == PackageManager.PERMISSION_DENIED) {
+
+        if (readExternalStorageAccess == PackageManager.PERMISSION_DENIED || pickAudioAccess == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ),
                 REQUEST_CODE_PERMISSIONS_ANDROID_6
             )
@@ -468,11 +584,10 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         minCalendar.set(2023, Calendar.JANUARY, 1)
         val maxCalendar = Calendar.getInstance()
         maxCalendar.set(2024, Calendar.DECEMBER, 31)
-
-        // Set initial values for the date picker
-        val initialYear = minCalendar.get(Calendar.YEAR)
-        val initialMonth = minCalendar.get(Calendar.MONTH)
-        val initialDay = minCalendar.get(Calendar.DAY_OF_MONTH)
+        // Set initial values for the date picker (use the current date)
+        val initialYear = Calendar.getInstance().get(Calendar.YEAR)
+        val initialMonth = Calendar.getInstance().get(Calendar.MONTH)
+        val initialDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(requireContext(), { _, year, month, day ->
             // Handle the selected date
@@ -486,8 +601,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 val formattedDate = dateFormat.format(selectedDate.time)
 
                 // Get the day of the week
-                val dayOfWeek =
-                    SimpleDateFormat("EEEE", Locale.getDefault()).format(selectedDate.time)
+                val dayOfWeek = SimpleDateFormat("EEEE", Locale.getDefault()).format(selectedDate.time)
                 val monthFormat = SimpleDateFormat("MMM", Locale.getDefault()).format(selectedDate.time)
 
                 // Update TextViews with formatted date and day of the week
@@ -522,51 +636,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         calendar.set(Calendar.MONTH, monthOfYear)
         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
         // Check if the selected date is within the allowed range
-
     }
-
-
-
-    private fun playPauseAudio() {
-        binding.playPauseBtn.setOnClickListener {
-            if (voice?.isNotEmpty() == true) {
-                if (!checkPlayPause) {
-                    requireContext().shortToast("Play")
-                    voice?.let { it1 -> voicePlayViewModel.playVoice(requireContext(), it1,binding.playPauseBtn) }
-                    binding.playPauseBtn.setImageResource(R.drawable.pause_icone)
-                    checkPlayPause = true
-                } else {
-                    requireContext().shortToast("Pause")
-                    voicePlayViewModel.pauseVoice()
-                    binding.playPauseBtn.setImageResource(R.drawable.next_arrow)
-                    checkPlayPause = false
-                }
-            }
-        }
-        binding.voiceDeleteBtn.setOnClickListener {
-            binding.voiceLayout.visibility = View.GONE
-            voice = null
-            voicePlayViewModel.releaseVoice()
-        }
-    }
-
-    private fun setupAudio() {
-        val job = scope.launch {
-            while (true) {
-                key = generateRandomString()
-                delay(1000)
-            }
-        }
-        job.start()
-        val directory = File(requireContext().filesDir, "audioFiles")
-        if (!directory.exists()) {
-            directory.mkdir()
-        }
-        val fileName = "${UUID.randomUUID()}.3gp"
-        audioFilePath = File(directory, fileName).absolutePath
-
-    }
-
     private fun generateRandomString(): String {
         val length = 10 // or any desired length
         val charset = ('a'..'z') + ('A'..'Z') + ('0'..'9')
@@ -587,6 +657,8 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     }
     private fun customBottomBarClickEvents() {
         binding.hashTagBtn.setOnClickListener {
+            Static.removehashTagBoolean = false
+            hashTagRecyclerAdapter.notifyDataSetChanged()
             binding.hashTagLayout.visibility = View.VISIBLE
         }
         binding.calenderDailogueBtn.setOnClickListener {
@@ -619,7 +691,15 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             }
         }
     }
-
+    private fun color(textColor: Int){
+        binding.titleEd.setHintTextColor(textColor)
+        binding.descriptionEd.setHintTextColor(textColor)
+        binding.dateTv.setTextColor(textColor)
+        binding.monthYearTv.setTextColor(textColor)
+        binding.dayTv.setTextColor(textColor)
+        binding.titleEd.setTextColor(textColor)
+        binding.descriptionEd.setTextColor(textColor)
+    }
     private fun backGroundThemeBottomSheet() {
         val dialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme)
         val view = layoutInflater.inflate(R.layout.background_theme_bottom_sheet, null)
@@ -648,8 +728,8 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         saveBtn.setOnClickListener {
             // Handle the save button click
             if (Static.backGroundImage != null) {
-                backGroundImage=Static.backGroundImage
-                binding.backGround.setBackgroundResource(Static.backGroundImage!!)
+                backGroundImage= Static.backGroundImage
+                Glide.with(requireContext()).load(backGroundImage).into(binding.backGround)
             }
             dialog.dismiss()
         }
@@ -744,85 +824,142 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         val dotsImage = view.findViewById<ImageView>(R.id.dotsImageView)
         val digitsImage = view.findViewById<ImageView>(R.id.digitsImageView)
         dotsBtn.setOnClickListener {
-            binding.descriptionEd.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    val string: String = text.toString()
-                    string.length > 1 && string[string.length - 2] == '\n'
-                }
-                override fun onTextChanged(txt: CharSequence, start: Int, before: Int, count: Int) {
-                    val string: String = txt.toString()
-                    if (string.isNotEmpty() && string[string.length - 1] == '\n') {
-                        val previousLineText = getPreviousLineText(txt)
-                        // Add the previous line text to the list
-                        if (previousLineText.isNotEmpty()) {
-                            linesList.add(previousLineText)
-                            // You can do something with the list here
-                            // For example, print the list:
-                        }
-                        requireContext().shortToast(string)
-                        if ( binding.descriptionEd.selectionStart == txt.length ||  binding.descriptionEd.selectionEnd == txt.length) {
-                            // Add bullet point and spaces for indentation
-                            binding.descriptionEd.text.append("\u2022    ")
+            if (!dotsButtonCLick){
+                val draw = dotsImage.drawable
+                draw.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.white),
+                    PorterDuff.Mode.SRC_IN
+                )
+                dotsImage.setImageDrawable(draw)
+                val d = digitsImage.drawable
+                d.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.black),
+                    PorterDuff.Mode.SRC_IN
+                )
+                digitsImage.setImageDrawable(d)
+                dotsBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
+                digitsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+                bulletStyle = MyConstants.BULLET_STYLE_DOTS
+                binding.descriptionEd.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(e: Editable?) {
+                        // Do nothing in the afterTextChanged method
+                    }
 
+                    override fun beforeTextChanged(arg0: CharSequence?, arg1: Int, arg2: Int, arg3: Int) {
+                        // Do nothing in the beforeTextChanged method
+                    }
+
+                    override fun onTextChanged(text: CharSequence?, start: Int, lengthBefore: Int, lengthAfter: Int) {
+                        if (dotsButtonCLick){
+                            if (lengthAfter > lengthBefore) {
+                                var newText = text?.toString()
+
+                                if (newText?.length == 1) {
+                                    newText = "◎ $newText"
+                                    binding.descriptionEd.setText(newText)
+                                    binding.descriptionEd.setSelection(binding.descriptionEd.text.length)
+                                }
+
+                                if (newText?.endsWith("\n") == true) {
+                                    newText = newText.replace("\n", "\n◎ ")
+                                    newText = newText.replace("◎ ◎", "◎")
+                                    binding.descriptionEd.setText(newText)
+                                    binding.descriptionEd.setSelection(binding.descriptionEd.text.length)
+                                }
+                            }
+                        }else{
 
                         }
                     }
-                }
-                override fun afterTextChanged(s: Editable?) {
-
-                }
-            })
-            val draw = dotsImage.drawable
-            draw.setColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.white),
-                PorterDuff.Mode.SRC_IN
-            )
-            dotsImage.setImageDrawable(draw)
-            val d = digitsImage.drawable
-            d.setColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.black),
-                PorterDuff.Mode.SRC_IN
-            )
-            digitsImage.setImageDrawable(d)
-            dotsBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
-            digitsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
-            bulletStyle = MyConstants.BULLET_STYLE_DOTS
+                })
+                dotsButtonCLick = true
+            }else{
+                bulletStyle = MyConstants.DEFAULT_BULLET_STYLE_DIGITS
+                val draw = dotsImage.drawable
+                draw.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.black),
+                    PorterDuff.Mode.SRC_IN
+                )
+                dotsImage.setImageDrawable(draw)
+                val drawabl = digitsImage.drawable
+                drawabl.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.black),
+                    PorterDuff.Mode.SRC_IN
+                )
+                digitsImage.setImageDrawable(drawabl)
+                dotsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+                digitsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+                dotsButtonCLick = false
+            }
         }
         digitsBtn.setOnClickListener {
-            binding.descriptionEd.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    val string: String = text.toString()
-                    string.length > 1 && string[string.length - 2] == '\n'
-                }
-                override fun onTextChanged(txt: CharSequence, start: Int, before: Int, count: Int) {
-                    val string: String = txt.toString()
-                    if (string.isNotEmpty() && string[string.length - 1] == '\n') {
-                        counter ++
-                        if ( binding.descriptionEd.selectionStart == txt.length ||  binding.descriptionEd.selectionEnd == txt.length) {
-                            // Add bullet point and spaces for indentation
-                            binding.descriptionEd.text.append("$counter    ")
-                        }
+            if (!digitsButton){
+                digitsButton  =  true
+                binding.descriptionEd.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+                    override fun onTextChanged( mText: CharSequence,
+                                                start: Int,
+                                                lengthBefore: Int,
+                                                lengthAfter: Int,) {
+                       if (digitsButton){
+                           var text = mText
+                           if (text.isNotEmpty()) {
+                               if (lengthAfter > lengthBefore) {
+                                   if (text.toString().endsWith("\n")) {
+                                       binding.descriptionEd.text.append("$counter ")
+                                       counter++
+                                   }
+                               } else if (lengthAfter < lengthBefore) {
+                                   // User removed a line, decrement the counter
+                                   val lines = text.split("\n")
+                                   if (lines.size < counter) {
+                                       counter--
+                                   }
+                               }
+                           }
+                       }else{
+
+                       }
                     }
-                }
-                override fun afterTextChanged(s: Editable?) {
-                    // You can perform additional actions after the text changes if needed
-                }
-            })
-            val draw = dotsImage.drawable
-            draw.setColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.black),
-                PorterDuff.Mode.SRC_IN
-            )
-            dotsImage.setImageDrawable(draw)
-            val drawabl = digitsImage.drawable
-            drawabl.setColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.white),
-                PorterDuff.Mode.SRC_IN
-            )
-            digitsImage.setImageDrawable(drawabl)
-            dotsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
-            digitsBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
-            bulletStyle = MyConstants.BULLET_STYLE_DIGITS
+                    override fun afterTextChanged(s: Editable?) {
+
+                    }
+                })
+                val draw = dotsImage.drawable
+                draw.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.black),
+                    PorterDuff.Mode.SRC_IN
+                )
+                dotsImage.setImageDrawable(draw)
+                val drawabl = digitsImage.drawable
+                drawabl.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.white),
+                    PorterDuff.Mode.SRC_IN
+                )
+                digitsImage.setImageDrawable(drawabl)
+                dotsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+                digitsBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
+                bulletStyle = MyConstants.BULLET_STYLE_DIGITS
+            }else{
+                digitsButton = false
+                bulletStyle = MyConstants.DEFAULT_BULLET_STYLE_DIGITS
+
+                val draw = dotsImage.drawable
+                draw.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.black),
+                    PorterDuff.Mode.SRC_IN
+                )
+                dotsImage.setImageDrawable(draw)
+                val drawabl = digitsImage.drawable
+                drawabl.setColorFilter(
+                    ContextCompat.getColor(requireContext(), R.color.black),
+                    PorterDuff.Mode.SRC_IN
+                )
+                digitsImage.setImageDrawable(drawabl)
+                dotsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+                digitsBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+            }
         }
         val string=bulletStyle
         when(string){
@@ -908,185 +1045,117 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             )
         }
         //Letters Style
-        val allNormalBtn = view.findViewById<LinearLayout>(R.id.normalLettersBtn)
-        val allCapitalBtn = view.findViewById<LinearLayout>(R.id.allCapitalLettersBtn)
-        val allSmallBtn = view.findViewById<LinearLayout>(R.id.allSmallLettersBtn)
+        val allCapitalBtn = view.findViewById<CardView>(R.id.allCapitalLettersBtn)
+        val allSmallBtn = view.findViewById<CardView>(R.id.allSmallLettersBtn)
         val allCapImg = view.findViewById<ImageView>(R.id.allCapitalLettersImage)
         val allSamImg = view.findViewById<ImageView>(R.id.allSmallLettersImage)
-        val normalCapImg = view.findViewById<ImageView>(R.id.normalLettersImage)
         allCapitalBtn.setOnClickListener {
-            setupTextLettersCustomizationOnViews(true, listOfTextView, listOfEditTexts)
-            allCapitalLettersSetup(
-                allNormalBtn,
-                allCapitalBtn,
-                allSmallBtn,
-                allSamImg,
-                normalCapImg,
-                allCapImg
-            )
-            capitalization = MyConstants.ALL_CAPITAL
+            if (!capitalLargeLetters){
+                setupTextLettersCustomizationOnViews(MyConstants.ALL_CAPITAL, listOfTextView, listOfEditTexts)
+                allCapitalLettersSetup(
+                    allCapitalBtn,
+                    allSmallBtn,
+                    allSamImg,
+                    allCapImg
+                )
+                capitalization = MyConstants.ALL_CAPITAL
+                capitalLargeLetters = true
+            }else{
+                capitalization = MyConstants.ALL_DEFAULT
+                capitalLargeLetters = false
+                setupTextLettersCustomizationOnViews(MyConstants.ALL_DEFAULT, listOfTextView, listOfEditTexts)
+                allDefaultCapLettersSetup(
+                    allCapitalBtn,
+                    allSmallBtn,
+                    allSamImg,
+                    allCapImg
+                )
+            }
         }
         allSmallBtn.setOnClickListener {
-            setupTextLettersCustomizationOnViews(false, listOfTextView, listOfEditTexts)
-            allSmallLettersSetup(
-                allNormalBtn,
-                allCapitalBtn,
-                allSmallBtn,
-                allSamImg,
-                normalCapImg,
-                allCapImg
-            )
-            capitalization = MyConstants.ALL_SMALL
-        }
-        allNormalBtn.setOnClickListener {
-            allNormalLettersSetup(
-                allNormalBtn,
-                allCapitalBtn,
-                allSmallBtn,
-                allSamImg,
-                normalCapImg,
-                allCapImg
-            )
-            capitalization = MyConstants.ALL_NORMAL
+          if (!smallLargeLetters){
+              setupTextLettersCustomizationOnViews(MyConstants.ALL_SMALL, listOfTextView, listOfEditTexts)
+              allSmallLettersSetup(
+                  allCapitalBtn,
+                  allSmallBtn,
+                  allSamImg,
+                  allCapImg
+              )
+              capitalization = MyConstants.ALL_SMALL
+              smallLargeLetters = true
+          }else{
+              setupTextLettersCustomizationOnViews(MyConstants.ALL_DEFAULT, listOfTextView, listOfEditTexts)
+              allDefaultSmallLettersSetup(
+                  allCapitalBtn,
+                  allSmallBtn,
+                  allSamImg,
+                  allCapImg
+              )
+              capitalization = MyConstants.ALL_DEFAULT
+              smallLargeLetters = false
+          }
         }
         val letterCapitalization =capitalization
         when (letterCapitalization) {
             MyConstants.ALL_CAPITAL -> {
                 allCapitalLettersSetup(
-                    allNormalBtn,
                     allCapitalBtn,
                     allSmallBtn,
                     allSamImg,
-                    normalCapImg,
                     allCapImg
                 )
             }
-
-            MyConstants.ALL_NORMAL -> {
-                allNormalLettersSetup(
-                    allNormalBtn,
-                    allCapitalBtn,
-                    allSmallBtn,
-                    allSamImg,
-                    normalCapImg,
-                    allCapImg
-                )
-            }
-
             MyConstants.ALL_SMALL -> {
                 allSmallLettersSetup(
-                    allNormalBtn,
                     allCapitalBtn,
                     allSmallBtn,
-                    allSamImg,
-                    normalCapImg,
-                    allCapImg
+                    allSamImg, allCapImg
                 )
             }
+
+
         }
         //Colors
-        val colorOneBtn = view.findViewById<ConstraintLayout>(R.id.colorOne_Purple)
-        val colorTwoBtn = view.findViewById<ConstraintLayout>(R.id.colorTwo_Red)
-        val colorThreeBtn = view.findViewById<ConstraintLayout>(R.id.colorThree_Blue)
-        val colorFourBtn = view.findViewById<ConstraintLayout>(R.id.colorFour_Pink)
-        val colorFiveBtn = view.findViewById<ConstraintLayout>(R.id.colorFive_Green)
-        val colorSixBtn = view.findViewById<ConstraintLayout>(R.id.colorSix_Yellow)
-        colorOneBtn.setOnClickListener {
-            binding.titleEd.setHintTextColor(resources.getColor(R.color.colorOne_Purple))
-            binding.descriptionEd.setHintTextColor(resources.getColor(R.color.colorOne_Purple))
-            binding.dateTv.setTextColor(resources.getColor(R.color.colorOne_Purple))
-            binding.monthYearTv.setTextColor(resources.getColor(R.color.colorOne_Purple))
-            binding.dayTv.setTextColor(resources.getColor(R.color.colorOne_Purple))
-            binding.titleEd.setTextColor(resources.getColor(R.color.colorOne_Purple))
-            binding.descriptionEd.setTextColor(resources.getColor(R.color.colorOne_Purple))
-            colorOneBtn.setBackgroundResource(R.drawable.circle_shape_pink)
-            colorTwoBtn.setBackgroundResource(android.R.color.transparent)
-            colorThreeBtn.setBackgroundResource(android.R.color.transparent)
-            colorFourBtn.setBackgroundResource(android.R.color.transparent)
-            colorFiveBtn.setBackgroundResource(android.R.color.transparent)
-            colorSixBtn.setBackgroundResource(android.R.color.transparent)
-            textColor = resources.getColor(R.color.colorOne_Purple)
-        }
-        colorTwoBtn.setOnClickListener {
-            binding.titleEd.setHintTextColor(resources.getColor(R.color.colorTwo_Red))
-            binding.descriptionEd.setHintTextColor(resources.getColor(R.color.colorTwo_Red))
-            binding.dateTv.setTextColor(resources.getColor(R.color.colorTwo_Red))
-            binding.monthYearTv.setTextColor(resources.getColor(R.color.colorTwo_Red))
-            binding.dayTv.setTextColor(resources.getColor(R.color.colorTwo_Red))
-            binding.titleEd.setTextColor(resources.getColor(R.color.colorTwo_Red))
-            binding.descriptionEd.setTextColor(resources.getColor(R.color.colorTwo_Red))
-            colorOneBtn.setBackgroundResource(android.R.color.transparent)
-            colorTwoBtn.setBackgroundResource(R.drawable.circle_shape_pink)
-            colorThreeBtn.setBackgroundResource(android.R.color.transparent)
-            colorFourBtn.setBackgroundResource(android.R.color.transparent)
-            colorFiveBtn.setBackgroundResource(android.R.color.transparent)
-            colorSixBtn.setBackgroundResource(android.R.color.transparent)
-            textColor = resources.getColor(R.color.colorTwo_Red)
-        }
-        colorThreeBtn.setOnClickListener {
-            binding.titleEd.setHintTextColor(resources.getColor(R.color.colorThree_Blue))
-            binding.descriptionEd.setHintTextColor(resources.getColor(R.color.colorThree_Blue))
-            binding.dateTv.setTextColor(resources.getColor(R.color.colorThree_Blue))
-            binding.monthYearTv.setTextColor(resources.getColor(R.color.colorThree_Blue))
-            binding.dayTv.setTextColor(resources.getColor(R.color.colorThree_Blue))
-            binding.titleEd.setTextColor(resources.getColor(R.color.colorThree_Blue))
-            binding.descriptionEd.setTextColor(resources.getColor(R.color.colorThree_Blue))
-            colorOneBtn.setBackgroundResource(android.R.color.transparent)
-            colorTwoBtn.setBackgroundResource(android.R.color.transparent)
-            colorThreeBtn.setBackgroundResource(R.drawable.circle_shape_pink)
-            colorFourBtn.setBackgroundResource(android.R.color.transparent)
-            colorFiveBtn.setBackgroundResource(android.R.color.transparent)
-            colorSixBtn.setBackgroundResource(android.R.color.transparent)
-            textColor = resources.getColor(R.color.colorThree_Blue)
-        }
-        colorFourBtn.setOnClickListener {
-            binding.titleEd.setHintTextColor(resources.getColor(R.color.colorFour_Pink))
-            binding.descriptionEd.setHintTextColor(resources.getColor(R.color.colorFour_Pink))
-            binding.dateTv.setTextColor(resources.getColor(R.color.colorFour_Pink))
-            binding.monthYearTv.setTextColor(resources.getColor(R.color.colorFour_Pink))
-            binding.dayTv.setTextColor(resources.getColor(R.color.colorFour_Pink))
-            binding.titleEd.setTextColor(resources.getColor(R.color.colorFour_Pink))
-            binding.descriptionEd.setTextColor(resources.getColor(R.color.colorFour_Pink))
-            colorOneBtn.setBackgroundResource(android.R.color.transparent)
-            colorTwoBtn.setBackgroundResource(android.R.color.transparent)
-            colorThreeBtn.setBackgroundResource(android.R.color.transparent)
-            colorFourBtn.setBackgroundResource(R.drawable.circle_shape_pink)
-            colorFiveBtn.setBackgroundResource(android.R.color.transparent)
-            colorSixBtn.setBackgroundResource(android.R.color.transparent)
-            textColor = resources.getColor(R.color.colorFour_Pink)
-        }
-        colorFiveBtn.setOnClickListener {
-            binding.titleEd.setHintTextColor(resources.getColor(R.color.colorFive_Green))
-            binding.descriptionEd.setHintTextColor(resources.getColor(R.color.colorFive_Green))
-            binding.dateTv.setTextColor(resources.getColor(R.color.colorFive_Green))
-            binding.monthYearTv.setTextColor(resources.getColor(R.color.colorFive_Green))
-            binding.dayTv.setTextColor(resources.getColor(R.color.colorFive_Green))
-            binding.titleEd.setTextColor(resources.getColor(R.color.colorFive_Green))
-            binding.descriptionEd.setTextColor(resources.getColor(R.color.colorFive_Green))
-            colorOneBtn.setBackgroundResource(android.R.color.transparent)
-            colorTwoBtn.setBackgroundResource(android.R.color.transparent)
-            colorThreeBtn.setBackgroundResource(android.R.color.transparent)
-            colorFourBtn.setBackgroundResource(android.R.color.transparent)
-            colorFiveBtn.setBackgroundResource(R.drawable.circle_shape_pink)
-            colorSixBtn.setBackgroundResource(android.R.color.transparent)
-            textColor = resources.getColor(R.color.colorFive_Green)
-        }
-        colorSixBtn.setOnClickListener {
-            binding.titleEd.setHintTextColor(resources.getColor(R.color.colorSix_Yellow))
-            binding.descriptionEd.setHintTextColor(resources.getColor(R.color.colorSix_Yellow))
-            binding.dateTv.setTextColor(resources.getColor(R.color.colorSix_Yellow))
-            binding.monthYearTv.setTextColor(resources.getColor(R.color.colorSix_Yellow))
-            binding.dayTv.setTextColor(resources.getColor(R.color.colorSix_Yellow))
-            binding.titleEd.setTextColor(resources.getColor(R.color.colorSix_Yellow))
-            binding.descriptionEd.setTextColor(resources.getColor(R.color.colorSix_Yellow))
-            colorOneBtn.setBackgroundResource(android.R.color.transparent)
-            colorTwoBtn.setBackgroundResource(android.R.color.transparent)
-            colorThreeBtn.setBackgroundResource(android.R.color.transparent)
-            colorFourBtn.setBackgroundResource(android.R.color.transparent)
-            colorFiveBtn.setBackgroundResource(android.R.color.transparent)
-            colorSixBtn.setBackgroundResource(R.drawable.circle_shape_pink)
-            textColor = resources.getColor(R.color.colorSix_Yellow)
-        }
+        val recyclerView: RecyclerView = view.findViewById(R.id.fontColorrecyclerView)
+        val colorItems = arrayListOf(
+            resources.getColor(R.color.colorOne_Purple),
+            resources.getColor(R.color.colorTwo_Red),
+            resources.getColor(R.color.colorThree_Blue),
+            resources.getColor(R.color.colorFour_Pink),
+            resources.getColor(R.color.colorFive_Green),
+            resources.getColor(R.color.colorSix_Yellow),
+            resources.getColor(R.color.colorSeven),
+            resources.getColor(R.color.colorEight),
+            resources.getColor(R.color.colorNine),
+            resources.getColor(R.color.colorTen),
+            resources.getColor(R.color.color11),
+            resources.getColor(R.color.color12),
+            resources.getColor(R.color.color13),
+            resources.getColor(R.color.color14),
+            resources.getColor(R.color.color15),
+            resources.getColor(R.color.color16),
+            resources.getColor(R.color.color17),
+            resources.getColor(R.color.color18),
+            resources.getColor(R.color.color19),
+            resources.getColor(R.color.color20),
+            resources.getColor(R.color.color21),
+            resources.getColor(R.color.color22),
+            resources.getColor(R.color.color23),
+            resources.getColor(R.color.color24),
+            resources.getColor(R.color.color25),
+            resources.getColor(R.color.color26),
+            resources.getColor(R.color.color24),
+            resources.getColor(R.color.color27)
+        )
+        val colorAdapter = FontColorBottomSheetRecAdapter(colorItems)
+        recyclerView.adapter = colorAdapter
+        colorAdapter.recyclerClick(object : FontColorBottomSheetRecAdapter.PassRateData{
+            override fun clickFunction(modelClass: Int, position: Int) {
+                textColor=modelClass
+                color(modelClass)
+            }
+
+        })
         // Fonts Family
         val fontOneBtn = view.findViewById<CardView>(R.id.fontFamilyOneBtn)
         val fontTwoBtn = view.findViewById<CardView>(R.id.fontFamilyTwoBtn)
@@ -1431,7 +1500,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                     selectedTextForHighLighting =
                         spannable.subSequence(startSelection, endSelection).toString()
                     spannable.setSpan(
-                        android.text.style.BackgroundColorSpan(Color.YELLOW),
+                        BackgroundColorSpan(Color.YELLOW),
                         startSelection,
                         endSelection,
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -1595,9 +1664,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         fontSixBtn.setCardBackgroundColor(resources.getColor(R.color.white))
         fontSevenBtn.setCardBackgroundColor(resources.getColor(R.color.white))
         fontEightBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
-        fontFamily = "baloo_bhai_2_bold.ttf"
-        allerTypeface = Typeface.createFromAsset(requireActivity().assets, "baloo_bhai_2_bold.ttf")
-        setupCustomFonts(allerTypeface, listOfTextView, listOfEditTexts)
+
     }
 
     private fun setupFontSeven(
@@ -1769,8 +1836,8 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         fontSixBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
         fontSevenBtn.setCardBackgroundColor(resources.getColor(R.color.white))
         fontEightBtn.setCardBackgroundColor(resources.getColor(R.color.white))
-        Static.fontFamily = "zeyada.ttf"
-        allerTypeface = Typeface.createFromAsset(requireActivity().assets, "zeyada.ttf")
+        Static.fontFamily = "trocchi.ttf"
+        allerTypeface = Typeface.createFromAsset(requireActivity().assets, "trocchi.ttf")
         setupCustomFonts(allerTypeface, listOfTextView, listOfEditTexts)
     }
 
@@ -2209,18 +2276,31 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         allerTypeface = Typeface.createFromAsset(requireActivity().assets, "roboto.ttf")
         setupCustomFonts(allerTypeface, listOfTextView, listOfEditTexts)
     }
-
-    private fun allCapitalLettersSetup(
-        allNormalBtn: LinearLayout, allCapitalBtn: LinearLayout,
-        allSmallBtn: LinearLayout, allSamImg: ImageView, normalCapImg: ImageView,
+    private fun allDefaultCapLettersSetup(
+        allCapitalBtn: CardView,
+        allSmallBtn: CardView, allSamImg: ImageView,
         allCapImg: ImageView
     ) {
-        val drawable = normalCapImg.drawable
-        drawable.setColorFilter(
+        val drawa = allCapImg.drawable
+        drawa.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.black),
             PorterDuff.Mode.SRC_IN
         )
-        normalCapImg.setImageDrawable(drawable)
+        allCapImg.setImageDrawable(drawa)
+        val drawble = allSamImg.drawable
+        drawble.setColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.black),
+            PorterDuff.Mode.SRC_IN
+        )
+        allSamImg.setImageDrawable(drawble)
+        allCapitalBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+        allSmallBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+    }
+    private fun allCapitalLettersSetup(
+         allCapitalBtn: CardView,
+        allSmallBtn: CardView, allSamImg: ImageView,
+        allCapImg: ImageView
+    ) {
         val drawa = allCapImg.drawable
         drawa.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.white),
@@ -2233,50 +2313,37 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             PorterDuff.Mode.SRC_IN
         )
         allSamImg.setImageDrawable(drawble)
-        allCapitalBtn.setBackgroundColor(resources.getColor(R.color.pinkButtonColor))
-        allSmallBtn.setBackgroundColor(resources.getColor(R.color.white))
-        allNormalBtn.setBackgroundColor(resources.getColor(R.color.white))
+        allCapitalBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
+        allSmallBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+    }
+    private fun allDefaultSmallLettersSetup(
+        allCapitalBtn: CardView,
+        allSmallBtn: CardView, allSamImg: ImageView,
+        allCapImg: ImageView
+    ) {
+
+        val drawa = allCapImg.drawable
+        drawa.setColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.black),
+            PorterDuff.Mode.SRC_IN
+        )
+        allCapImg.setImageDrawable(drawa)
+        val drawble = allSamImg.drawable
+        drawble.setColorFilter(
+            ContextCompat.getColor(requireContext(), R.color.black),
+            PorterDuff.Mode.SRC_IN
+        )
+        allSamImg.setImageDrawable(drawble)
+        allCapitalBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+        allSmallBtn.setCardBackgroundColor(resources.getColor(R.color.white))
     }
 
     private fun allSmallLettersSetup(
-        allNormalBtn: LinearLayout, allCapitalBtn: LinearLayout,
-        allSmallBtn: LinearLayout, allSamImg: ImageView, normalCapImg: ImageView,
+        allCapitalBtn: CardView,
+        allSmallBtn: CardView, allSamImg: ImageView,
         allCapImg: ImageView
     ) {
-        val drawable = normalCapImg.drawable
-        drawable.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.black),
-            PorterDuff.Mode.SRC_IN
-        )
-        normalCapImg.setImageDrawable(drawable)
-        val drawa = allCapImg.drawable
-        drawa.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.black),
-            PorterDuff.Mode.SRC_IN
-        )
-        allCapImg.setImageDrawable(drawa)
-        val drawble = allSamImg.drawable
-        drawble.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.white),
-            PorterDuff.Mode.SRC_IN
-        )
-        allSamImg.setImageDrawable(drawble)
-        allCapitalBtn.setBackgroundColor(resources.getColor(R.color.white))
-        allSmallBtn.setBackgroundColor(resources.getColor(R.color.pinkButtonColor))
-        allNormalBtn.setBackgroundColor(resources.getColor(R.color.white))
-    }
 
-    private fun allNormalLettersSetup(
-        allNormalBtn: LinearLayout, allCapitalBtn: LinearLayout,
-        allSmallBtn: LinearLayout, allSamImg: ImageView, normalCapImg: ImageView,
-        allCapImg: ImageView
-    ) {
-        val drawable = normalCapImg.drawable
-        drawable.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.white),
-            PorterDuff.Mode.SRC_IN
-        )
-        normalCapImg.setImageDrawable(drawable)
         val drawa = allCapImg.drawable
         drawa.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.black),
@@ -2285,13 +2352,12 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         allCapImg.setImageDrawable(drawa)
         val drawble = allSamImg.drawable
         drawble.setColorFilter(
-            ContextCompat.getColor(requireContext(), R.color.black),
+            ContextCompat.getColor(requireContext(), R.color.white),
             PorterDuff.Mode.SRC_IN
         )
         allSamImg.setImageDrawable(drawble)
-        allCapitalBtn.setBackgroundColor(resources.getColor(R.color.white))
-        allSmallBtn.setBackgroundColor(resources.getColor(R.color.white))
-        allNormalBtn.setBackgroundColor(resources.getColor(R.color.pinkButtonColor))
+        allCapitalBtn.setCardBackgroundColor(resources.getColor(R.color.white))
+        allSmallBtn.setCardBackgroundColor(resources.getColor(R.color.pinkButtonColor))
     }
 
     private fun textSizeNormalSetup(
@@ -2343,8 +2409,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         val drawble = largeTextSizeImg.drawable
         drawble.setColorFilter(
             ContextCompat.getColor(requireContext(), R.color.black),
-            PorterDuff.Mode.SRC_IN
-        )
+            PorterDuff.Mode.SRC_IN)
         largeTextSizeImg.setImageDrawable(drawble)
         mediumTextSizeBtn.setBackgroundColor(resources.getColor(R.color.pinkButtonColor))
         largeTextSizeBtn.setBackgroundColor(resources.getColor(R.color.white))
@@ -2500,19 +2565,48 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         recordingBtn.setOnClickListener {
-            if (audioFilePath != null) {
-                // Start recording
-                startRecordingViewModel(audioFilePath!!)
-                saveBtn.visibility=View.GONE
-                cancelBtn.visibility=View.GONE
-                voicePickBtn.visibility=View.GONE
-                recordingBtn.visibility=View.GONE
-                title.visibility=View.GONE
-                recordingTextView.visibility=View.GONE
-                pickFileTextView.visibility=View.GONE
-                recordingLayout.visibility=View.VISIBLE
+            val builder = AlertDialog.Builder(requireContext(),R.style.CustomAlertDialog)
+                .create()
+            val view = layoutInflater.inflate(R.layout.voice_recording_alert,null)
+            val  cancleBtn = view.findViewById<TextView>(R.id.cancleBtn)
+            val  okBtn = view.findViewById<TextView>(R.id.okBtn)
+            val  nameEd = view.findViewById<EditText>(R.id.nameEd)
+            builder.setView(view)
+            cancleBtn.setOnClickListener {
+                builder.dismiss()
+            }
+            okBtn.setOnClickListener {
+                builder.dismiss()
+                val named=nameEd.text.toString()
+                if (named.isNotEmpty()){
+                    addedVoiceByRecording = true
+                    voiceName=named
+                    val directory = File(requireContext().filesDir, "audioFiles")
+                    if (!directory.exists()) {
+                        directory.mkdir()
+                    }
+                    audioFilePath = File(directory, named).absolutePath
+
+                    if (audioFilePath != null) {
+                        // Start recording
+                        startRecordingViewModel(this.audioFilePath!!)
+                        saveBtn.visibility=View.GONE
+                        cancelBtn.visibility=View.GONE
+                        voicePickBtn.visibility=View.GONE
+                        recordingBtn.visibility=View.GONE
+                        title.visibility=View.GONE
+                        recordingTextView.visibility=View.GONE
+                        pickFileTextView.visibility=View.GONE
+                        recordingLayout.visibility=View.VISIBLE
+
+                    }
+                }else{
+                    nameEd.error="Please enter name"
+                }
 
             }
+            builder.setCanceledOnTouchOutside(false)
+            builder.show()
         }
         stopRecordingBtn.setOnClickListener {
             stopRecordingViewModel()
@@ -2527,12 +2621,10 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         }
 
         saveBtn.setOnClickListener {
-            if (formattedDuration?.isNotEmpty() == true) {
-                binding.voiceDuration.text = formattedDuration
-                durationOfVoice = formattedDuration
+            if (voiceModelList?.isNotEmpty() == true) {
+                mVoiceRecAdapter.notifyDataSetChanged()
+                binding.voiceLayout.visibility=View.VISIBLE
             }
-            binding.playPauseBtn.setImageResource(R.drawable.next_arrow)
-            binding.voiceLayout.visibility = View.VISIBLE
             // Handle the save button click
             dialog.dismiss()
         }
@@ -2555,11 +2647,10 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     }
 
     private fun observeRecordingState() {
-        voiceRecordingViewModel.recordingState.observe(viewLifecycleOwner, { state ->
+        voiceRecordingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is VoiceRecorderHelper.Recording -> {
                     // Handle recording started
-                    requireContext().shortToast("Recording started")
                 }
 
                 is VoiceRecorderHelper.Done -> {
@@ -2567,10 +2658,22 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                     formattedDuration = recordingModel.formattedDuration
                     voice = recordingModel.filePath
                     // Handle recording completed
-                    requireContext().shortToast("Recording completed: $recordingModel")
-
+                    voice?.let { voicePathList.add(it) }
+                    formattedDuration?.let { voiceDurationList.add(it) }
+                    if (voicePathList.isNotEmpty() && voiceDurationList.isNotEmpty()){
+                        voice?.let { VoiceRecordingModelClass(voiceName,it, formattedDuration!!) }
+                            ?.let {
+                                if (addedVoiceByRecording){
+                                    voiceModelList.add(it)
+                                    addedVoiceByRecording = false
+                                }
+                            }
+                    }
+                    mVoiceRecAdapter.notifyDataSetChanged()
+                    if (voiceModelList.isNotEmpty()){
+                        binding.voiceLayout.visibility=View.VISIBLE
+                    }
                     // Update UI or perform any other actions as needed
-                    binding.voiceDuration.text = formattedDuration
                 }
 
                 is VoiceRecorderHelper.Error -> {
@@ -2586,7 +2689,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
 
                 }
             }
-        })
+        }
     }
     private fun updateDuration(durationTextView:TextView) {
         seconds++
@@ -2624,10 +2727,10 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 if (position == 0) {
                     captureImage()
                 } else {
-                    if (listOfSelectedImages.contains(modelClass.uri.toString())){
-                        listOfSelectedImages.remove(modelClass.uri.toString())
+                    if (createNoteModelList.contains(modelClass.uri.toString())){
+                        createNoteModelList.remove(modelClass.uri.toString())
                     }else{
-                        listOfSelectedImages.add(modelClass.uri.toString())
+                        createNoteModelList.add(modelClass.uri.toString())
                     }
                     val selectedItems = mGalleryImagesPickerAdapter.getSelectedItems()
                     val isSelected = modelClass.isSelected
@@ -2653,10 +2756,10 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         saveBtn.setOnClickListener {
-            if (listOfSelectedImages.size>4){
+            if (createNoteModelList.size>4){
                 requireContext().shortToast("Max Four Images Allowed")
             }else{
-                if (listOfSelectedImages.isNotEmpty()) {
+                if (createNoteModelList.isNotEmpty()) {
                     setUpImagesAccordingtoSelection()
                 }
             }
@@ -2672,45 +2775,16 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
 
     }
 
-    private fun selectedImageViewClicks() {
-        val bundle = Bundle()
 
-    }
-
-    private fun removeImagesAccordingToPositions() {
-
-    }
 
     private fun setUpImagesAccordingtoSelection() {
-        if (listOfSelectedImages.isNotEmpty()) {
-            createNoteModelList.addAll(listOfSelectedImages)
+        if (createNoteModelList.isNotEmpty()) {
+            binding.ImageViewLayout.visibility=View.VISIBLE
             mCreateNoteImagesAdapter.notifyDataSetChanged()
         }
     }
 
-    private fun removeImageAtIndex(index: Int) {
-        if (MyConstants.listOfImageCounting.size > index) {
-            listOfSelectedImages.removeAt(index)
-//            MyConstants.listOfImageCounting.removeAt(index)
-            updateImageViewsVisibility()
-        }
 
-    }
-
-    private fun updateImageViewsVisibility() {
-        // Update the visibility of ImageViews based on the size of selectedImageUris
-        val visibilityArray = arrayOf(
-            View.GONE,
-            View.GONE,
-            View.GONE,
-            View.GONE
-        )
-
-        for (i in 0 until listOfSelectedImages.size) {
-            visibilityArray[i] = View.VISIBLE
-        }
-
-    }
 
     private fun captureImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -2751,10 +2825,6 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             hasCameraPermission
         }
     }
-
-    // Define a constant for the permission request code
-    private val PERMISSION_REQUEST_CODE = 123
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -2765,7 +2835,6 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         ) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 // All permissions granted, proceed with the operation
-                requireContext().shortToast("6 to 10 version")
                 galleryImagePickerBottomSheet()
             } else {
                 // Permissions not granted, handle accordingly
@@ -2790,7 +2859,6 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         }else if (requestCode==CAMERA_REQUEST_CODE){
             captureImage()
         }else if (requestCode==PICK_AUDIO_REQUEST_CODE){
-            playPauseAudio()
         }
     }
     private fun openAudioPicker() {
@@ -2809,11 +2877,13 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             if (requestCode == PICK_AUDIO_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
                 val audioUri: Uri? = data.data
                 if (audioUri != null) {
-                    // Access the selected audio file using the URI
                     val audioContentResolver = context?.contentResolver
                     val audioInputStream = audioContentResolver?.openInputStream(audioUri)
+
                     if (audioInputStream != null) {
-                        val audilFile = key?.let { createTempFile(audioInputStream, it) }
+                        // Create a temporary file
+                        val audioFile = createTempFile(audioInputStream)
+
                         // Use MediaPlayer to get the audio duration
                         val mediaPlayer = MediaPlayer()
                         mediaPlayer.setDataSource(
@@ -2823,22 +2893,31 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                             )?.fileDescriptor
                         )
                         mediaPlayer.prepare()
-                        val duration = mediaPlayer.duration
+                        val durationMillis = mediaPlayer.duration
                         mediaPlayer.release()
 
                         // Convert duration to a human-readable format (hh:mm:ss)
-                        formattedDuration = String.format(
+                        val formattedDuration = String.format(
                             "%02d:%02d",
-                            TimeUnit.MILLISECONDS.toMinutes(duration.toLong()),
-                            TimeUnit.MILLISECONDS.toSeconds(duration.toLong()) % TimeUnit.MINUTES.toSeconds(
-                                1
-                            )
+                            TimeUnit.MILLISECONDS.toMinutes(durationMillis.toLong()),
+                            TimeUnit.MILLISECONDS.toSeconds(durationMillis.toLong()) % TimeUnit.MINUTES.toSeconds(1)
                         )
-                        if (audilFile != null) {
-                            voice = audilFile.absolutePath
-                            audio_File = audilFile
+
+                        // Get the audio name
+                        val audioName = getAudioName(audioUri)
+
+                        if (audioFile != null) {
+                            // Store the information as needed
+                            val voiceRecordingModelClass = VoiceRecordingModelClass(
+                                voiceName = audioName,
+                                voicePath = audioFile.absolutePath,
+                                duration = formattedDuration
+                            )
+                            voiceModelList.add(voiceRecordingModelClass)
+                            mVoiceRecAdapter.notifyDataSetChanged()
+
+                            // Now, you can use voiceRecordingModelClass as needed.
                         }
-                        // Display the duration in a TextView
                     }
                 }
             } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
@@ -2846,111 +2925,24 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 val imageBitmap = data.extras?.get("data") as Bitmap?
                 imageBitmap?.let { bitmapToString(it) }?.let { MyConstants.list.add(it) }
                 if (imageBitmap != null) {
+
+                    createNoteModelList.add(bitmapToUri(imageBitmap).toString())
                     bitmapToUri(imageBitmap)?.let { MyConstants.listOfImageCounting.add(it) }
                 }
-
                 // Do something with the captured image (e.g., display it in an ImageView)
             }
         }catch (e:Exception){
 
         }
+    }
+    fun getAudioName(uri: Uri): String {
+        val cursor = requireContext().contentResolver?.query(uri, null, null, null, null)
+        val nameIndex = cursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        cursor?.moveToFirst()
+        val audioName = cursor?.getString(nameIndex ?: -1) ?: ""
+        cursor?.close()
 
-//            } else if (requestCode == REQUEST_CODE_PERMISSIONS_ANDROID_11 && resultCode == RESULT_OK) {
-//                if (requestCode == PICK_AUDIO_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-//                    val audioUri: Uri? = data.data
-//                    if (audioUri != null) {
-//                        // Access the selected audio file using the URI
-//                        val audioContentResolver = context?.contentResolver
-//                        val audioInputStream = audioContentResolver?.openInputStream(audioUri)
-//
-//                        if (audioInputStream != null) {
-//                            val audilFile= key?.let { createTempFile(audioInputStream, it) }
-//                            // Use MediaPlayer to get the audio duration
-//                            val mediaPlayer = MediaPlayer()
-//                            mediaPlayer.setDataSource(audioContentResolver.openFileDescriptor(audioUri, "r")?.fileDescriptor)
-//                            mediaPlayer.prepare()
-//                            val duration = mediaPlayer.duration
-//                            mediaPlayer.release()
-//
-//                            // Convert duration to a human-readable format (hh:mm:ss)
-//                           val d  = String.format(
-//                                "%02d:%02d",
-//                                TimeUnit.MILLISECONDS.toMinutes(duration.toLong()),
-//                                TimeUnit.MILLISECONDS.toSeconds(duration.toLong()) % TimeUnit.MINUTES.toSeconds(1)
-//                            )
-//                            if (audilFile != null) {
-//                                binding.voiceDuration.setText(d)
-//                                Static.voice=audilFile.absolutePath
-//                                audio_File= audilFile
-//                            }
-//                            // Display the duration in a TextView
-//                        }
-//                    }
-//
-//                } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-//                    // Handle captured image from the camera
-//                    val imageBitmap = data.extras?.get("data") as Bitmap?
-//                    Static.imageUri= imageBitmap?.let { bitmapToUri(it) }
-//                    // Do something with the captured image (e.g., display it in an ImageView)
-//                }
-//
-//                // Handle permissions granted for Android 11 and Android 12
-//            } else if (requestCode == REQUEST_CODE_PERMISSIONS_ANDROID_6 && resultCode == RESULT_OK) {
-//                if (requestCode == PICK_AUDIO_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-//                    val audioUri: Uri? = data.data
-//                    if (audioUri != null) {
-//                        requireContext().shortToast(audioUri.toString())
-//                        // Access the selected audio file using the URI
-//                        val audioContentResolver = context?.contentResolver
-//                        val audioInputStream = audioContentResolver?.openInputStream(audioUri)
-//
-//                        if (audioInputStream != null) {
-//                            val audioFile = key?.let { createTempFile(audioInputStream, it) }
-//
-//                            // Use MediaPlayer to get the audio duration asynchronously
-//                            val mediaPlayer = MediaPlayer()
-//                            mediaPlayer.setDataSource(audioContentResolver.openFileDescriptor(audioUri, "r")?.fileDescriptor)
-//
-//                            mediaPlayer.setOnPreparedListener { player ->
-//                                val duration = player.duration
-//
-//                                // Convert duration to a human-readable format (hh:mm:ss)
-//                                val d = String.format(
-//                                    "%02d:%02d",
-//                                    TimeUnit.MILLISECONDS.toMinutes(duration.toLong()),
-//                                    TimeUnit.MILLISECONDS.toSeconds(duration.toLong()) % TimeUnit.MINUTES.toSeconds(1)
-//                                )
-//
-//                                // Update UI with the duration
-//                                requireActivity().runOnUiThread {
-//                                    binding.voiceDuration.text = d
-//                                    Static.voice = audioFile?.absolutePath
-//                                    audio_File = audioFile
-//                                }
-//                                mediaPlayer.release()
-//                            }
-//
-//                            mediaPlayer.prepareAsync()
-//                            // Display the duration in a TextView
-//                        }
-//                    }
-//
-//                } else if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-//                    // Handle captured image from the camera
-//                    val imageBitmap = data.extras?.get("data") as Bitmap?
-//                    Static.imageUri= imageBitmap?.let { bitmapToUri(it) }
-//                    // Do something with the captured image (e.g., display it in an ImageView)
-//                }
-//
-//                // Handle permissions granted for Android 6 and above
-//            } else {
-//                // Handle permissions denied
-//            }
-//        }catch (e:Exception){
-//            requireContext().longToast(e.message.toString())
-//            Log.d("Crash", "onActivityResult: "+e.message.toString())
-//        }
-
+        return audioName
     }
     fun bitmapToString(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -2959,19 +2951,24 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 
-    private fun createTempFile(inputStream: InputStream, fileName: String): File {
-        val tempFile = File(requireContext().cacheDir, fileName)
-        tempFile.deleteOnExit()
+    private fun createTempFile(inputStream: InputStream): File? {
         try {
-            FileOutputStream(tempFile).use { output ->
-                inputStream.use { input ->
+            val tempFile = File.createTempFile("audio_temp", ".temp")
+            tempFile.deleteOnExit()
+
+            val outputStream = FileOutputStream(tempFile)
+            inputStream.use { input ->
+                outputStream.use { output ->
                     input.copyTo(output)
                 }
             }
+
+            return tempFile
         } catch (e: IOException) {
-            Log.d("Crash", "InputStream: "+e.message.toString())
+            e.printStackTrace()
         }
-        return tempFile
+
+        return null
     }
     fun bitmapToUri(bitmap: Bitmap): Uri? {
         val contentResolver: ContentResolver = requireContext().contentResolver
@@ -3005,17 +3002,14 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         emojiBtn.setOnEmojiPickedListener { emojiS->
-            val description = binding.descriptionEd.text.toString()
-            if (description.isEmpty()){
-                binding.descriptionEd.setText(emojiS.emoji)
-            }else{
-                updated=description+emoji
-                if (updated?.isEmpty()==true){
-                    binding.descriptionEd.setText("")
-                }else{
-                    binding.descriptionEd.setText(updated)
-                }
-            }
+            val descriptionEditText = binding.descriptionEd
+            val description = descriptionEditText.text.toString()
+            // Add the emoji
+            val textWithEmoji = description + "${emojiS.emoji}"
+            // Set the updated text back to the EditText
+            descriptionEditText.setText(textWithEmoji)
+            descriptionEditText.setSelection(textWithEmoji.length)
+
             emoji=emojiS.emoji
         }
         saveBtn.setOnClickListener {
@@ -3081,7 +3075,9 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         val statusSeven = view.findViewById<ImageView>(R.id.emojiSeven)
         val statusEight = view.findViewById<ImageView>(R.id.emojiEight)
         val cancelBtn = view.findViewById<CardView>(R.id.cancelBtn)
-        val saveBtn = view.findViewById<TextView>(R.id.saveBtn)
+        val saveBtn = view.findViewById<CardView>(R.id.saveBtn)
+        val theme= SharedPrefObj.getAppTheme(requireContext())
+        saveBtn.setCardBackgroundColor(theme.color)
         // Connect TabLayout and ViewPager2
         saveBtn.setOnClickListener {
             status?.let { it1 -> binding.noteViewStatusImage.setImageResource(it1) }
@@ -3091,7 +3087,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         cancelBtn.setOnClickListener {
             // Handle the cancel button click
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
-            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET, true)
+//            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET, true)
         }
         statusOne.setOnClickListener {
             statusOne.setBackgroundResource(R.drawable.circle_shape_pink)
@@ -3184,13 +3180,16 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         dialog.setCancelable(true)
         dialog.setContentView(view)
         dialog.setOnCancelListener {
-            SharedPrefObj.saveBoolean(requireContext(),MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,true)
+            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,true)
             // Handle the cancel listener if needed
         }
         dialog.show()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        MyConstants.listOfImageCounting.clear()
+        MyConstants.list.clear()
+        MyConstants.tagList.clear()
     }
 }

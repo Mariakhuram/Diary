@@ -9,6 +9,6 @@
     android:layout_weight="1"
     app:defaultNavHost="true"
     app:navGraph="@navigation/splash_nav_host"
-    tools:context=".presentation.ui.navigation.MainActivity">
+    tools:context="com.mk.diary.presentation.ui.navigation.MainActivity">
 
 </androidx.fragment.app.FragmentContainerView>

@@ -3,18 +3,22 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="text_View_Bold">#434343</color>
+    <color name="text_View_Pass">#403B37</color>
     <color name="text_Color">#5B5B5B</color>
     <color name="radio_Color">#FFACF8</color>
+    <color name="selectedC">#809F9DFF</color>
     <color name="viewBackground">#F1F1F1</color>
-    <color name="pinkButtonColor">#9F9DFF</color>
-    <color name="textViewSmooth">#9B9396</color>
+    <color name="textViewSmooth">#403B37</color>
     <color name="selected_State_Color">#263238</color>
     <color name="smoothBack">#EDEDED</color>
     <color name="hastagColor">#999898</color>
     <color name="red_Smooth">#FD556E</color>
     <color name="d9D9">#D9D9D9</color>
+    <color name="d3d3d">#3D3D3D</color>
+    <color name="blackNinePer">#17000000</color>
     <color name="smoothPink">#FFDFDF</color>
     <color name="unselected_State_Color">#707B89</color>
+    <color name="color123">#8A919F</color>
     //font_text_Colors_Pattern
     <color name="colorOne_Purple">#837FD3</color>
     <color name="colorTwo_Red">#FF0000</color>
@@ -22,4 +26,38 @@
     <color name="colorFour_Pink">#FFA5E6</color>
     <color name="colorFive_Green">#61FF00</color>
     <color name="colorSix_Yellow">#FBFF44</color>
+    <color name="colorSeven">#00FFFF</color>
+    <color name="colorEight">#1F75FE</color>
+    <color name="colorNine">#FFFFFF</color>
+    <color name="colorTen">#926EAE</color>
+    <color name="color11">#FF5348</color>
+    <color name="color12">#FDB853</color>
+    <color name="color13">#B4674D</color>
+    <color name="color14">#C5E383</color>
+    <color name="color15">#FCE983</color>
+    <color name="color16">#5D75CB</color>
+    <color name="color17">#000000</color>
+    <color name="color18">#1CAC77</color>
+    <color name="color19">#FFA9CB</color>
+    <color name="color20">#7367BD</color>
+    <color name="color21">#95928D</color>
+    <color name="color22">#C14490</color>
+    <color name="color23">#FF7537</color>
+    <color name="color24">#0E97BB</color>
+    <color name="color25">#FDDB6D</color>
+    <color name="color26">#FDD9B5</color>
+    <color name="color27">#EF204E</color>
+    //themeColors
+    <color name="pinkButtonColor">#9F9DFF</color>
+    <color name="appTheme1">#00AAF8</color>
+    <color name="appTheme2">#D06A74</color>
+    <color name="appTheme3">#F9A2D0</color>
+    <color name="appTheme4">#A88AB0</color>
+    <color name="appTheme5">#EABB90</color>
+    <color name="appTheme6">#E06168</color>
+    <color name="appTheme7">#7FBEBF</color>
+    <color name="appTheme8">#FFC504</color>
+    <color name="appTheme9">#A0C414</color>
+
+
 </resources>

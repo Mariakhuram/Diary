@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@drawable/background_image"
-    tools:context=".presentation.ui.boardpassing.GetReadyFragment">
+    tools:context="com.mk.diary.presentation.ui.boardpassing.GetReadyFragment">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:padding="@dimen/_20sdp"
@@ -23,23 +22,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-        <androidx.cardview.widget.CardView
-            app:cardCornerRadius="@dimen/_11sdp"
-            android:layout_width="@dimen/_22sdp"
-            android:layout_height="@dimen/_22sdp"
-            android:id="@+id/backBtn"
-            android:layout_marginStart="@dimen/_2sdp"
-            app:cardElevation="@dimen/_4sdp"
-            app:layout_constraintTop_toTopOf="@id/textView"
-            app:layout_constraintBottom_toBottomOf="@id/textView"
-            app:layout_constraintStart_toStartOf="parent">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:padding="@dimen/_2sdp"
-                android:src="@drawable/arrow_back"/>
-        </androidx.cardview.widget.CardView>
+<!--        <androidx.cardview.widget.CardView-->
+<!--            app:cardCornerRadius="@dimen/_11sdp"-->
+<!--            android:layout_width="@dimen/_22sdp"-->
+<!--            android:layout_height="@dimen/_22sdp"-->
+<!--            android:id="@+id/backBtn"-->
+<!--            android:layout_marginStart="@dimen/_2sdp"-->
+<!--            app:cardElevation="@dimen/_4sdp"-->
+<!--            app:layout_constraintTop_toTopOf="@id/textView"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/textView"-->
+<!--            app:layout_constraintStart_toStartOf="parent">-->
+<!--            <ImageView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:padding="@dimen/_2sdp"-->
+<!--                android:src="@drawable/arrow_back"/>-->
+<!--        </androidx.cardview.widget.CardView>-->
         <ImageView
             android:id="@+id/logo"
             android:layout_width="match_parent"

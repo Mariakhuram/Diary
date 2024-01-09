@@ -17,7 +17,6 @@ class NoteViewRepositoryImp @Inject constructor(private val dao: NoteViewDao
             ResultCase.Error(e.message ?: "An error occurred")
         }
     }
-
     override suspend fun updateData(noteViewModelClass: NoteViewModelClass):ResultCase<Unit> {
         return try {
             dao.updateData(noteViewModelClass)
@@ -26,7 +25,6 @@ class NoteViewRepositoryImp @Inject constructor(private val dao: NoteViewDao
             ResultCase.Error(e.message.toString())
         }
     }
-
     override suspend fun deleteData(noteViewModelClass: NoteViewModelClass):ResultCase<Unit>{
         return try {
             dao.deleteData(noteViewModelClass)
@@ -39,14 +37,9 @@ class NoteViewRepositoryImp @Inject constructor(private val dao: NoteViewDao
     override suspend fun deleteAllData() {
         dao.deleteAll()
     }
-
     override suspend fun getAllData(): LiveData<List<NoteViewModelClass>> {
         return dao.getAllData()
     }
-
-
-
-
     override suspend fun getDataForDateAndYear(
         date: String,
         year: String,
@@ -54,8 +47,8 @@ class NoteViewRepositoryImp @Inject constructor(private val dao: NoteViewDao
     ): LiveData<List<NoteViewModelClass>> {
         return dao.getDataForDateAndYear(date,month,year)
     }
-
     override suspend fun getItemByPosition(position: Int): NoteViewModelClass? {
         return dao.getDataByPosition(position)
     }
+
 }

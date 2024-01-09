@@ -8,7 +8,8 @@ import com.mk.diary.presentation.ui.noteview.tablayout.ClassicFragment
 import com.mk.diary.presentation.ui.noteview.tablayout.ColorFragment
 import com.mk.diary.presentation.ui.noteview.tablayout.CuteThemeFragment
 import com.mk.diary.presentation.ui.noteview.tablayout.HolidayThemeFragment
-import com.mk.diary.presentation.ui.noteview.tablayout.SimpleThemeFragment
+import com.mk.diary.presentation.ui.noteview.tablayout.SimpleThemFragment
+
 
 class BackgroundThemeTabLayoutAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
@@ -22,7 +23,7 @@ class BackgroundThemeTabLayoutAdapter(fragmentActivity: FragmentActivity) : Frag
         return when (position) {
             0 -> AllBackroundThemeFragment() // Replace with your BackgroundFragment class
             1 -> ClassicFragment()     // Replace with your EmojiFragment class
-            2 -> SimpleThemeFragment()     // Replace with your FontsFragment class
+            2 -> SimpleThemFragment()     // Replace with your FontsFragment class
             3 -> CuteThemeFragment()
             4 -> HolidayThemeFragment()
             5 -> ColorFragment()

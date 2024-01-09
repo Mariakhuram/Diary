@@ -1,21 +1,17 @@
 package com.mk.diary.presentation.viewmodels.noteview
 
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mk.diary.domain.models.NoteViewModelClass
 import com.mk.diary.domain.usecase.NoteViewUseCase
 import com.mk.diary.helpers.ResultCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class NoteViewModel  @Inject constructor(val useCase: NoteViewUseCase): ViewModel() {
+class NoteViewModel  @Inject constructor(private val useCase: NoteViewUseCase): ViewModel() {
 
 
     suspend fun getAllData(): LiveData<List<NoteViewModelClass>> {
@@ -52,5 +48,9 @@ class NoteViewModel  @Inject constructor(val useCase: NoteViewUseCase): ViewMode
     suspend fun getItemByPosition(position:Int):NoteViewModelClass?{
         return useCase.getItemByPosition(position)
     }
-
+    fun deleteAllData(){
+        viewModelScope.launch {
+            useCase.deleteAllData()
+        }
+    }
 }

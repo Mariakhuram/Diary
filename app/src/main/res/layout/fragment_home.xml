@@ -1,24 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:fillViewport="true"
-    android:background="@drawable/background_image"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.tabs.HomeFragment">
+    tools:context="com.mk.diary.presentation.ui.tabs.HomeFragment">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:padding="@dimen/_10sdp"
         android:layout_height="match_parent">
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:id="@+id/setShowListItemsTypeCard"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/_10sdp"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:layout_constraintEnd_toEndOf="@+id/showListTypeBtn"
+            app:layout_constraintTop_toBottomOf="@+id/showListTypeBtn">
+            <RadioGroup
+                android:paddingEnd="@dimen/_26sdp"
+                android:id="@+id/listGroupBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RadioButton
+                    android:id="@+id/newesttFirstBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:buttonTint="@color/radio_Color"
+                    android:text="@string/newestFeed"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:textAlignment="center"
+                    android:fontFamily="@font/baloo_bhai_2"
+                    android:textColor="@color/text_View_Bold"
+                    android:textSize="@dimen/_14ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <RadioButton
+                    android:id="@+id/oldestFirstBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:buttonTint="@color/radio_Color"
+                    android:paddingStart="@dimen/_10sdp"
+                    android:text="@string/oldestfirst"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_View_Bold"
+                    android:fontFamily="@font/baloo_bhai_2"
+                    android:textSize="@dimen/_14ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </RadioGroup>
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
             android:fontFamily="@font/baloo_bhai_2_semibold"
             android:text="@string/mydairy"
-            android:layout_marginTop="@dimen/_10sdp"
             android:textColor="@color/text_View_Bold"
             android:textSize="@dimen/_16ssp"
             android:textStyle="bold"
@@ -27,87 +70,104 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/showListTypeBtn"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/_24sdp"
+            android:layout_height="@dimen/_26sdp"
             android:layout_gravity="center"
-            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
             android:src="@drawable/more_icone"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="@+id/title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/title" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/_24sdp"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="@dimen/_26sdp"
             android:layout_gravity="center"
             android:id="@+id/searchViewBtn"
+            android:scaleType="centerCrop"
             android:layout_marginEnd="@dimen/_10sdp"
             android:src="@drawable/searchviewicone"
             app:layout_constraintBottom_toBottomOf="@+id/title"
-            app:layout_constraintEnd_toStartOf="@+id/imageView"
+            app:layout_constraintEnd_toStartOf="@+id/showListTypeBtn"
             app:layout_constraintTop_toTopOf="@+id/title" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_20sdp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:orientation="vertical"
             android:id="@+id/home_Recycler_View"
-            android:layout_marginBottom="@dimen/_20sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="@dimen/_minus8sdp"
             app:layout_constraintTop_toBottomOf="@id/title" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/tvResultEmptyLayout"
-            android:layout_width="@dimen/_200sdp"
-            android:layout_height="@dimen/_165sdp"
-            android:background="@drawable/homeemptyicone"
+            android:id="@+id/bouncingEffectContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/home_Recycler_View"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/home_Recycler_View">
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0">
 
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:src="@drawable/emptydiaryicone"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/tvResultEmptyLayout"
+                android:layout_width="@dimen/_200sdp"
+                android:layout_height="@dimen/_165sdp"
+                android:background="@drawable/homeemptyicone"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginBottom="@dimen/_20sdp">
 
-            <TextView
-                android:id="@+id/emptyTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:fontFamily="@font/baloo_bhai_2_semibold"
-                android:text="@string/writeherefirstMemeory"
-                android:textColor="@color/text_View_Bold"
-                android:textSize="@dimen/_12ssp"
-                android:layout_marginTop="@dimen/_10sdp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:src="@drawable/emptydiaryicone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/_10sdp"
-                android:layout_marginEnd="@dimen/_10sdp"
-                android:fontFamily="@font/inter_thin"
-                android:gravity="center"
-                android:text="@string/emptyDesc"
-                android:textColor="@color/textViewSmooth"
-                android:textSize="@dimen/_10ssp"
-                app:layout_constraintEnd_toEndOf="@id/emptyTitle"
-                app:layout_constraintStart_toStartOf="@id/emptyTitle"
-                app:layout_constraintTop_toBottomOf="@+id/emptyTitle" />
+                <TextView
+                    android:id="@+id/emptyTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:fontFamily="@font/baloo_bhai_2_semibold"
+                    android:gravity="center"
+                    android:text="@string/writeherefirstMemeory"
+                    android:textColor="@color/text_View_Bold"
+                    android:textSize="@dimen/_12ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_10sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:fontFamily="@font/inter_thin"
+                    android:gravity="center"
+                    android:text="@string/emptyDesc"
+                    android:textColor="@color/textViewSmooth"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintEnd_toEndOf="@id/emptyTitle"
+                    app:layout_constraintStart_toStartOf="@id/emptyTitle"
+                    app:layout_constraintTop_toBottomOf="@+id/emptyTitle" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

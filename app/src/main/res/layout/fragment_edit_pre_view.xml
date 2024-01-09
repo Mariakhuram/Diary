@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true"
+    android:layout_height="match_parent"
+    tools:context="com.mk.diary.presentation.ui.noteview.EditPreViewFragment">
+    <ImageView
+        android:id="@+id/backGround"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:paddingBottom="@dimen/_30sdp"
+            android:paddingEnd="@dimen/_20sdp"
+            android:layout_height="match_parent">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/backBtn"
+                android:layout_width="@dimen/_22sdp"
+                android:layout_height="@dimen/_22sdp"
+                android:layout_marginStart="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_30sdp"
+                app:cardCornerRadius="@dimen/_11sdp"
+                app:cardElevation="@dimen/_4sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:padding="@dimen/_6sdp"
+                    android:src="@drawable/crossicone" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/baloo_bhai_2_semibold"
+                android:text="@string/preview"
+                android:textAlignment="center"
+                android:textColor="@color/text_View_Bold"
+                android:textSize="@dimen/_20ssp"
+                android:textStyle="normal"
+                app:layout_constraintBottom_toBottomOf="@+id/backBtn"
+                app:layout_constraintEnd_toEndOf="parent"
+
+                app:layout_constraintStart_toEndOf="@+id/backBtn"
+                app:layout_constraintTop_toTopOf="@+id/backBtn" />
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="@dimen/_38sdp"
+                android:layout_height="@dimen/_38sdp"
+                android:visibility="gone"
+                android:id="@+id/noteViewStatusCard"
+                app:cardCornerRadius="@dimen/_19sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/calenderDailogueBtn"
+                app:layout_constraintTop_toTopOf="@+id/calenderDailogueBtn">
+                <ImageView
+                    android:id="@+id/noteViewStatusImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:src="@drawable/emoji" />
+            </androidx.cardview.widget.CardView>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/backBtn"
+                app:layout_constraintStart_toStartOf="@id/backBtn"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:id="@+id/calenderDailogueBtn"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/dateTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/baloo_bhai_2_semibold"
+                    android:text="14"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_22ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    />
+
+                <View
+                    android:id="@+id/dateViewLine"
+                    android:layout_width="@dimen/_1sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:layout_marginStart="@dimen/_4sdp"
+                    android:layout_marginTop="@dimen/_minus4sdp"
+                    android:background="@color/black"
+                    app:layout_constraintBottom_toBottomOf="@+id/dateTv"
+                    app:layout_constraintStart_toEndOf="@+id/dateTv"
+                    app:layout_constraintTop_toTopOf="@+id/dateTv" />
+                <TextView
+                    android:id="@+id/monthYearTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/_4sdp"
+                    android:text="Nov 2023"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toTopOf="@id/dayTv"
+                    app:layout_constraintStart_toEndOf="@id/dateViewLine"
+                    app:layout_constraintTop_toTopOf="@id/dateViewLine" />
+
+                <TextView
+                    android:id="@+id/dayTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/monday"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="normal"
+                    app:layout_constraintBottom_toBottomOf="@id/dateViewLine"
+                    app:layout_constraintStart_toStartOf="@id/monthYearTv"
+                    app:layout_constraintTop_toBottomOf="@id/monthYearTv" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/titleEd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/_14sdp"
+                android:background="@null"
+                android:scrollbars="vertical"
+                android:fontFamily="@font/baloo_bhai_2_bold"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textColorHint="@color/textViewSmooth"
+                android:textSize="@dimen/_16ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/backBtn"
+                app:layout_constraintTop_toBottomOf="@+id/calenderDailogueBtn" />
+
+            <TextView
+                android:id="@+id/descriptionEd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@null"
+                android:fontFamily="@font/baloo_bhai_2_semibold"
+                android:textColor="@color/black"
+                android:textColorHint="@color/textViewSmooth"
+                android:textSize="@dimen/_14ssp"
+                android:singleLine="false"
+                android:inputType="textMultiLine"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/backBtn"
+                app:layout_constraintTop_toBottomOf="@+id/titleEd" />
+
+            <LinearLayout
+                android:id="@+id/ImageViewLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:gravity="start|center"
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/_4sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/backBtn"
+                app:layout_constraintTop_toBottomOf="@id/descriptionEd">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/create_note_rec"
+                    tools:listitem="@layout/create_note_images_rec"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/voiceLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/backBtn"
+                app:layout_constraintTop_toBottomOf="@+id/ImageViewLayout">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/voiceRec"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/hashTagLayout"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_30sdp"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/backBtn"
+                app:layout_constraintTop_toBottomOf="@+id/voiceLayout">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/recyclerTagLayout"
+                    tools:listitem="@layout/hash_tag_rec"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="horizontal"
+                    />            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

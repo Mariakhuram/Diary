@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.mk.diary.R
-import com.mk.diary.databinding.FragmentSetPasswordDisplayBinding
+import my.dialy.dairy.journal.dairywithlock.R
+import my.dialy.dairy.journal.dairywithlock.databinding.FragmentSetPasswordDisplayBinding
 
 
 class SetPasswordDisplayFragment : Fragment() {
@@ -18,14 +18,14 @@ class SetPasswordDisplayFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding= FragmentSetPasswordDisplayBinding.inflate(layoutInflater)
-        binding.backBtn.setOnClickListener {
-            fragmentManager?.popBackStack()
-        }
+//        binding.backBtn.setOnClickListener {
+//            fragmentManager?.popBackStack()
+//        }
         binding.setpaswordBtn.setOnClickListener {
-            findNavController()
-                .navigate(R.id.action_setPasswordDisplayFragment2_to_getReadyFragment2)
+            findNavController().navigate(R.id.action_setPasswordDisplayFragment_to_passwordFragment)
         }
         return binding.root
     }
+
 
 }

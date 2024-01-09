@@ -18,32 +18,5 @@
         android:id="@+id/selectLanguageFragment2"
         android:name="com.mk.diary.presentation.ui.boardpassing.SelectLanguageFragment"
         android:label="fragment_select_language"
-        tools:layout="@layout/fragment_select_language" >
-        <action
-            android:id="@+id/action_selectLanguageFragment2_to_setPasswordDisplayFragment2"
-            app:destination="@id/setPasswordDisplayFragment2" />
-    </fragment>
-    <fragment
-        android:id="@+id/setPasswordDisplayFragment2"
-        android:name="com.mk.diary.presentation.ui.boardpassing.SetPasswordDisplayFragment"
-        android:label="fragment_set_password_display"
-        tools:layout="@layout/fragment_set_password_display" >
-        <action
-            android:id="@+id/action_setPasswordDisplayFragment2_to_getReadyFragment2"
-            app:destination="@id/getReadyFragment2" />
-    </fragment>
-    <fragment
-        android:id="@+id/getReadyFragment2"
-        android:name="com.mk.diary.presentation.ui.boardpassing.GetReadyFragment"
-        android:label="fragment_get_ready"
-        tools:layout="@layout/fragment_get_ready" >
-        <action
-            android:id="@+id/action_getReadyFragment2_to_letsStartFragment2"
-            app:destination="@id/letsStartFragment2" />
-    </fragment>
-    <fragment
-        android:id="@+id/letsStartFragment2"
-        android:name="com.mk.diary.presentation.ui.boardpassing.LetsStartFragment"
-        android:label="fragment_lets_start"
-        tools:layout="@layout/fragment_lets_start" />
+        tools:layout="@layout/fragment_select_language" />
 </navigation>

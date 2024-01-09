@@ -21,7 +21,11 @@
         android:id="@+id/galleryFragment"
         android:name="com.mk.diary.presentation.ui.tabs.GalleryFragment"
         android:label="fragment_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_gallery" >
+        <action
+            android:id="@+id/action_galleryFragment_to_noteViewDetailsImageViewFragment"
+            app:destination="@id/noteViewDetailsImageViewFragment" />
+    </fragment>
     <fragment
         android:id="@+id/createNoteFragment"
         android:name="com.mk.diary.presentation.ui.noteview.CreateNoteFragment"
@@ -33,22 +37,43 @@
         <action
             android:id="@+id/action_createNoteFragment_to_imageViewDetailsFragment"
             app:destination="@id/imageViewDetailsFragment" />
+        <action
+            android:id="@+id/action_createNoteFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/calenderFragment2"
         android:name="com.mk.diary.presentation.ui.tabs.CalenderFragment"
         android:label="fragment_calender"
-        tools:layout="@layout/fragment_calender" />
+        tools:layout="@layout/fragment_calender" >
+        <action
+            android:id="@+id/action_calenderFragment2_to_noteViewDetailsFragment2"
+            app:destination="@id/noteViewDetailsFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/menuSettingsFragment"
         android:name="com.mk.diary.presentation.ui.settings.MenuSettingsFragment"
         android:label="fragment_menu_settings"
-        tools:layout="@layout/fragment_menu_settings" />
+        tools:layout="@layout/fragment_menu_settings" >
+        <action
+            android:id="@+id/action_menuSettingsFragment_to_deleteDatabaseFragment"
+            app:destination="@id/deleteDatabaseFragment" />
+        <action
+            android:id="@+id/action_menuSettingsFragment_to_appThemeFragment"
+            app:destination="@id/appThemeFragment"/>
+        <action
+            android:id="@+id/action_menuSettingsFragment_to_passwordSettingFragment"
+            app:destination="@id/passwordSettingFragment" />
+    </fragment>
     <fragment
         android:id="@+id/noteViewSearchFragment"
         android:name="com.mk.diary.presentation.ui.noteview.NoteViewSearchFragment"
         android:label="fragment_note_view_search"
-        tools:layout="@layout/fragment_note_view_search" />
+        tools:layout="@layout/fragment_note_view_search" >
+        <action
+            android:id="@+id/action_noteViewSearchFragment_to_noteViewDetailsFragment2"
+            app:destination="@id/noteViewDetailsFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/noteViewDetailsFragment2"
         android:name="com.mk.diary.presentation.ui.noteview.NoteViewDetailsFragment"
@@ -73,7 +98,14 @@
         android:id="@+id/editNoteFragment"
         android:name="com.mk.diary.presentation.ui.noteview.EditNoteFragment"
         android:label="fragment_edit_note"
-        tools:layout="@layout/fragment_edit_note" />
+        tools:layout="@layout/fragment_edit_note" >
+        <action
+            android:id="@+id/action_editNoteFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_editNoteFragment_to_editPreViewFragment"
+            app:destination="@id/editPreViewFragment" />
+    </fragment>
     <fragment
         android:id="@+id/imageViewDetailsFragment"
         android:name="com.mk.diary.presentation.ui.noteview.ImageViewDetailsFragment"
@@ -84,4 +116,36 @@
         android:name="com.mk.diary.presentation.ui.noteview.NoteViewDetailsImageViewFragment"
         android:label="fragment_note_view_details_image_view"
         tools:layout="@layout/fragment_note_view_details_image_view" />
+    <fragment
+        android:id="@+id/editPreViewFragment"
+        android:name="com.mk.diary.presentation.ui.noteview.EditPreViewFragment"
+        android:label="fragment_edit_pre_view"
+        tools:layout="@layout/fragment_edit_pre_view" />
+    <fragment
+        android:id="@+id/deleteDatabaseFragment"
+        android:name="com.mk.diary.presentation.ui.settings.DeleteDatabaseFragment"
+        android:label="fragment_delete_database"
+        tools:layout="@layout/fragment_delete_database" />
+    <fragment
+        android:id="@+id/appThemeFragment"
+        android:name="com.mk.diary.presentation.ui.settings.AppThemeFragment"
+        android:label="fragment_app_theme"
+        tools:layout="@layout/fragment_app_theme" />
+    <fragment
+        android:id="@+id/passwordResetFragment"
+        android:name="com.mk.diary.presentation.ui.settings.PasswordResetFragment"
+        android:label="fragment_password_reset"
+        tools:layout="@layout/fragment_password_reset" />
+    <fragment
+        android:id="@+id/passwordSettingFragment"
+        android:name="com.mk.diary.presentation.ui.settings.PasswordSettingFragment"
+        android:label="fragment_password_setting"
+        tools:layout="@layout/fragment_password_setting" >
+        <action
+            android:id="@+id/action_passwordSettingFragment_to_passwordResetFragment"
+            app:destination="@id/passwordResetFragment" />
+        <action
+            android:id="@+id/action_passwordSettingFragment_to_menuSettingsFragment"
+            app:destination="@id/menuSettingsFragment" />
+    </fragment>
 </navigation>

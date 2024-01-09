@@ -3,12 +3,12 @@ package com.mk.diary.database
 import android.content.Context
 import androidx.room.Room
 import com.mk.diary.data.entity.NoteViewDao
-import com.mk.diary.database.AppDatabase.Callback
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 
@@ -25,7 +25,7 @@ class DatabaseModule {
     @Singleton
     fun provideAppDatabase(
         @ApplicationContext context: Context,
-        callback: Callback
+        callback: AppDatabase.Callback
     ): AppDatabase {
         return Room.databaseBuilder(
             context,
@@ -37,3 +37,4 @@ class DatabaseModule {
 
     }
 }
+

@@ -4,11 +4,17 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
-    android:id="@+id/backGround"
-    android:background="@drawable/background_image"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.noteview.NoteViewDetailsFragment">
-
+    tools:context="com.mk.diary.presentation.ui.noteview.NoteViewDetailsFragment">
+    <ImageView
+        android:id="@+id/backGround"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -48,6 +54,7 @@
                 android:layout_width="@dimen/_38sdp"
                 android:layout_height="@dimen/_38sdp"
                 android:visibility="gone"
+                android:layout_marginEnd="@dimen/_2sdp"
                 app:cardCornerRadius="@dimen/_19sdp"
                 app:layout_constraintBottom_toBottomOf="@+id/calenderDailogueBtn"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -188,53 +195,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/backBtn"
                 app:layout_constraintTop_toBottomOf="@+id/ImageViewLayout">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="@dimen/_120sdp"
-                    android:layout_height="@dimen/_30sdp"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:background="@drawable/rounded_corners_shape"
-                    android:backgroundTint="@color/smoothBack"
-                    app:layout_constraintStart_toStartOf="@+id/ImageViewLayout"
-                    app:layout_constraintTop_toBottomOf="@+id/ImageViewLayout">
-
-                    <ImageView
-                        android:id="@+id/playPauseBtn"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_marginStart="@dimen/_10sdp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/next_arrow"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/unselected_State_Color" />
-
-                    <TextView
-                        android:id="@+id/voiceDuration"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/_4sdp"
-                        android:text="Nov 2023"
-                        android:textAlignment="center"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/_10ssp"
-                        android:textStyle="normal"
-                        app:layout_constraintBottom_toBottomOf="@id/playPauseBtn"
-                        app:layout_constraintStart_toEndOf="@id/playPauseBtn"
-                        app:layout_constraintTop_toTopOf="@id/playPauseBtn" />
-
-                    <ImageView
-                        android:id="@+id/voiceDeleteBtn"
-                        android:layout_width="@dimen/_18sdp"
-                        android:layout_height="@dimen/_18sdp"
-                        android:layout_marginEnd="@dimen/_10sdp"
-                        android:src="@drawable/deleteicone"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/voiceRec"
+                    tools:listitem="@layout/voice_recording_rec"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/hashTagLayout"
@@ -242,6 +209,7 @@
                 android:layout_height="@dimen/_30sdp"
                 android:layout_marginTop="@dimen/_12sdp"
                 android:orientation="horizontal"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/backBtn"
                 app:layout_constraintTop_toBottomOf="@+id/voiceLayout">
@@ -259,6 +227,7 @@
     </ScrollView>
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
+        app:cardElevation="@dimen/_2sdp"
         android:layout_width="match_parent"
         android:layout_marginBottom="@dimen/_minus20sdp"
         app:cardCornerRadius="@dimen/_20sdp"
@@ -303,7 +272,7 @@
                     android:layout_marginBottom="@dimen/_4sdp"
                     android:text="@string/edit"
                     android:textAlignment="center"
-                    android:textColor="@color/pinkButtonColor"
+                    android:textColor="@color/unselected_State_Color"
                     android:textSize="@dimen/_10ssp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -339,7 +308,7 @@
                     android:layout_marginBottom="@dimen/_4sdp"
                     android:text="@string/delete"
                     android:textAlignment="center"
-                    android:textColor="@color/pinkButtonColor"
+                    android:textColor="@color/unselected_State_Color"
                     android:textSize="@dimen/_10ssp"
                     android:textStyle="normal"
                     app:layout_constraintBottom_toBottomOf="parent"

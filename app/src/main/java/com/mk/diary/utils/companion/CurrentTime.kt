@@ -1,4 +1,4 @@
-package com.mk.mydiary.utils.companion
+package com.mk.diary.utils.companion
 
 import java.text.SimpleDateFormat
 import java.util.Date

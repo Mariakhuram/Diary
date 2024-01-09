@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
-    android:background="@drawable/background_image"
-    tools:context=".presentation.ui.noteview.ImageViewDetailsFragment">
+    tools:context="com.mk.diary.presentation.ui.noteview.ImageViewDetailsFragment">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:padding="@dimen/_15sdp"
@@ -36,18 +35,23 @@
             app:layout_constraintBottom_toBottomOf="@+id/backBtn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/backBtn" />
-        <ImageView
+        <com.jsibbold.zoomage.ZoomageView
+            android:id="@+id/imageView"
+            android:layout_marginTop="@dimen/_20sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/backBtn"
+            app:layout_constraintTop_toBottomOf="@+id/backBtn"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:padding="@dimen/_1sdp"
-            android:layout_marginTop="@dimen/_20sdp"
-            android:scaleType="fitCenter"
-            android:id="@+id/imageView"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/deleteBtn"
-            app:layout_constraintStart_toStartOf="@id/backBtn"
-            app:layout_constraintTop_toBottomOf="@+id/backBtn" />
+            app:zoomage_animateOnReset="true"
+            app:zoomage_autoCenter="true"
+            app:zoomage_autoResetMode="UNDER"
+            app:zoomage_maxScale="8"
+            app:zoomage_minScale="0.6"
+            app:zoomage_restrictBounds="false"
+            app:zoomage_translatable="true"
+            app:zoomage_zoomable="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

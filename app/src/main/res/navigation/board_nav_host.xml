@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/board_nav_host"
+    app:startDestination="@id/setPasswordDisplayFragment">
+
+    <fragment
+        android:id="@+id/setPasswordDisplayFragment"
+        android:name="com.mk.diary.presentation.ui.boardpassing.SetPasswordDisplayFragment"
+        android:label="fragment_set_password_display"
+        tools:layout="@layout/fragment_set_password_display" >
+        <action
+            android:id="@+id/action_setPasswordDisplayFragment_to_passwordFragment"
+            app:destination="@id/passwordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordFragment"
+        android:name="com.mk.diary.presentation.ui.boardpassing.PasswordFragment"
+        android:label="fragment_password"
+        tools:layout="@layout/fragment_password" >
+        <action
+            android:id="@+id/action_passwordFragment_to_setPasswordFragment"
+            app:destination="@id/setPasswordFragment" />
+        <action
+            android:id="@+id/action_passwordFragment_to_passwordVerificationFragment"
+            app:destination="@id/passwordVerificationFragment" />
+        <action
+            android:id="@+id/action_passwordFragment_to_passwordVerificationFragment2"
+            app:destination="@id/passwordVerificationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/setPasswordFragment"
+        android:name="com.mk.diary.presentation.ui.boardpassing.SetPasswordFragment"
+        android:label="fragment_set_password"
+        tools:layout="@layout/fragment_set_password" >
+        <action
+            android:id="@+id/action_setPasswordFragment_to_passwordVerificationFragment"
+            app:destination="@id/passwordVerificationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/passwordVerificationFragment"
+        android:name="com.mk.diary.presentation.ui.boardpassing.PasswordVerificationFragment"
+        android:label="fragment_password_verification"
+        tools:layout="@layout/fragment_password_verification" >
+        <action
+            android:id="@+id/action_passwordVerificationFragment_to_getReadyFragment3"
+            app:destination="@id/getReadyFragment3" />
+        <action
+            android:id="@+id/action_passwordVerificationFragment_to_passwordFragment"
+            app:destination="@id/passwordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/getReadyFragment3"
+        android:name="com.mk.diary.presentation.ui.boardpassing.GetReadyFragment"
+        android:label="fragment_get_ready"
+        tools:layout="@layout/fragment_get_ready" >
+        <action
+            android:id="@+id/action_getReadyFragment3_to_letsStartFragment"
+            app:destination="@id/letsStartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/letsStartFragment"
+        android:name="com.mk.diary.presentation.ui.boardpassing.LetsStartFragment"
+        android:label="fragment_lets_start"
+        tools:layout="@layout/fragment_lets_start" />
+</navigation>

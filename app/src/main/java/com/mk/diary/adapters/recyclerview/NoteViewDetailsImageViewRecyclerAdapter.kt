@@ -1,18 +1,12 @@
 package com.mk.diary.adapters.recyclerview
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.mk.diary.R
-import com.mk.diary.domain.models.ImageItem
-import com.mk.mydiary.utils.MyConstants
+import my.dialy.dairy.journal.dairywithlock.R
 
 class NoteViewDetailsImageViewRecyclerAdapter(private val modelList: List<String>) :
     RecyclerView.Adapter<NoteViewDetailsImageViewRecyclerAdapter.ViewHolder>() {
@@ -25,6 +19,7 @@ class NoteViewDetailsImageViewRecyclerAdapter(private val modelList: List<String
     fun recyclerClick(listener: PassRateData) {
         click = listener
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.noteview_details_images_rec, parent, false)
         return ViewHolder(view)

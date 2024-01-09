@@ -4,12 +4,8 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.util.Log
 import android.widget.ImageView
-import com.mk.diary.R
 import com.mk.diary.domain.repository.VoicePlayingRepository
-import com.mk.mydiary.service.VoiceService
-import com.mk.mydiary.utils.MyConstants
-import com.mk.mydiary.utils.SharedPrefObj
-import com.mk.mydiary.utils.companion.Static
+import my.dialy.dairy.journal.dairywithlock.R
 import java.io.IOException
 import javax.inject.Inject
 
@@ -30,7 +26,7 @@ class VoicePlayingRepositoryImp @Inject constructor():VoicePlayingRepository {
                 mediaPlayer?.prepare()
                 mediaPlayer?.start()
                 mediaPlayer?.setOnCompletionListener {
-                    image.setImageResource(R.drawable.next_arrow)
+                    image.setImageResource(R.drawable.playvoiceicone)
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -48,10 +44,6 @@ class VoicePlayingRepositoryImp @Inject constructor():VoicePlayingRepository {
         mediaPlayer?.pause()
     }
     override suspend fun releaseVoice() {
-    }
-
-    override suspend fun cm(): Boolean {
-        return isPlaybackComplete
     }
 
 }

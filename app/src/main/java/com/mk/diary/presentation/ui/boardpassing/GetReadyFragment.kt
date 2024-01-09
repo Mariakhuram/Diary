@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.mk.diary.R
-import com.mk.diary.databinding.FragmentGetReadyBinding
+import my.dialy.dairy.journal.dairywithlock.R
+import my.dialy.dairy.journal.dairywithlock.databinding.FragmentGetReadyBinding
 
 
 class GetReadyFragment : Fragment() {
@@ -19,7 +19,7 @@ class GetReadyFragment : Fragment() {
         // Inflate the layout for this fragment
         binding= FragmentGetReadyBinding.inflate(layoutInflater,container,false)
         binding.setpaswordBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_getReadyFragment2_to_letsStartFragment2)
+            findNavController().navigate(R.id.action_getReadyFragment3_to_letsStartFragment)
         }
         return binding.root
     }

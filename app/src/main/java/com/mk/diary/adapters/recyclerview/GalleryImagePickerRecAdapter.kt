@@ -9,9 +9,9 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.mk.diary.R
 import com.mk.diary.domain.models.ImageItem
-import com.mk.mydiary.utils.MyConstants
+import com.mk.diary.utils.MyConstants
+import my.dialy.dairy.journal.dairywithlock.R
 
 class GalleryImagePickerRecAdapter(private val imageList: List<ImageItem>) :
     RecyclerView.Adapter<GalleryImagePickerRecAdapter.ViewHolder>() {
@@ -58,7 +58,6 @@ class GalleryImagePickerRecAdapter(private val imageList: List<ImageItem>) :
             .into(holder.imageView)
         holder.itemView.setOnClickListener {
             if (position==0){
-
             }else{
                 imageItem.isSelected = !imageItem.isSelected
                 if (MyConstants.listOfImageCounting.contains(imageItem.uri)){

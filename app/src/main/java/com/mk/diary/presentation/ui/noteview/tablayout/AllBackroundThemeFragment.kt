@@ -1,63 +1,89 @@
 package com.mk.diary.presentation.ui.noteview.tablayout
 
-import android.net.Uri
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.mk.diary.R
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.mk.diary.adapters.recyclerview.BackGroundThemeRecAdapter
-import com.mk.diary.adapters.recyclerview.GalleryImagePickerRecAdapter
-import com.mk.diary.databinding.FragmentAllBackroundThemeBinding
-import com.mk.diary.databinding.FragmentCreateNoteBinding
-import com.mk.diary.domain.models.ImageItem
-import com.mk.mydiary.utils.companion.Static
+import com.mk.diary.domain.models.BackgroundThemeModelClass
 
+import com.mk.diary.helpers.ResultCase
+import com.mk.diary.presentation.viewmodels.coordinator.CoordinatorViewModel
+import com.mk.diary.presentation.viewmodels.theme.BackgroundThemeViewModel
+import com.mk.diary.utils.SharedPrefObj
+import com.mk.diary.utils.appext.shortToast
+import com.mk.diary.utils.companion.Static
+import dagger.hilt.android.AndroidEntryPoint
+import my.dialy.dairy.journal.dairywithlock.databinding.FragmentAllBackroundThemeBinding
 
+@AndroidEntryPoint
 class AllBackroundThemeFragment : Fragment() {
-    private val modelList :ArrayList<ImageItem> by lazy { ArrayList() }
+    private val coordinatorViewModel : CoordinatorViewModel by activityViewModels()
+    private val modelList :ArrayList<BackgroundThemeModelClass> by lazy { ArrayList() }
     private val mAdapter by lazy { BackGroundThemeRecAdapter(modelList) }
     lateinit var binding: FragmentAllBackroundThemeBinding
+    private val viewModel : BackgroundThemeViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding=FragmentAllBackroundThemeBinding.inflate(layoutInflater,container,false)
+        binding= FragmentAllBackroundThemeBinding.inflate(layoutInflater,container,false)
+        viewModel.getAll()
+
         recyclerView()
+        viewModel()
         return binding.root
     }
-
     private fun recyclerView() {
-        val themeOne = R.drawable.themeone // Replace with your drawable resource ID
-        val themeOneUri = Uri.parse("android.resource://${requireContext().packageName}/$themeOne")
-        val themeTwo = R.drawable.themetwo // Replace with your drawable resource ID
-        val themeTwoUri = Uri.parse("android.resource://${requireContext().packageName}/$themeTwo")
-        val themeThree= R.drawable.themethree // Replace with your drawable resource ID
-        val themeThreeUri = Uri.parse("android.resource://${requireContext().packageName}/$themeThree")
-        modelList.add(ImageItem(themeOneUri))
-        modelList.add(ImageItem(themeTwoUri))
-        modelList.add(ImageItem(themeThreeUri))
         binding.recyclerView.adapter=mAdapter
         mAdapter.recyclerClick(object :BackGroundThemeRecAdapter.PassRateData{
-            override fun clickFunction(modelClass: ImageItem, position: Int) {
-                when(position){
-                    0->{
-                        Static.backGroundImage=themeOne
-                    }
-                    1->{
-                        Static.backGroundImage=themeTwo
-                    }
-                    2->{
-                        Static.backGroundImage=themeThree
-                    }
-                }
+            override fun clickFunction(modelClass: BackgroundThemeModelClass, position: Int) {
+                Static.backGroundImage=modelClass.uri
+                coordinatorViewModel.sendDataToViewModel(modelClass.uri)
             }
         })
 
     }
+    private fun viewModel(){
+        viewModel.allLiveData.observe(viewLifecycleOwner){result->
+            when (result) {
+                is ResultCase.Loading -> {
+                    showProgressBar()
+                }
+                is ResultCase.Success -> {
+                    hideProgressBar()
+                    modelList.clear()
+                    // Add each item individually to modelList
+                    for (data in result.data) {
+                        modelList.add(BackgroundThemeModelClass(data))
+                    }
+                    // Notify the adapter that the data has changed
+                    mAdapter.notifyDataSetChanged()
+                }
+                is ResultCase.Error -> {
+                    hideProgressBar()
+                    requireContext().shortToast(result.message.toString())
+                }
+            }
+        }
+    }
+
+    private fun showProgressBar() {
+        val theme=SharedPrefObj.getAppTheme(requireContext())
+        theme.color?.let { color ->
+            // Use the color value to set the progress bar tint
+            binding.progressBar.progressTintList = ColorStateList.valueOf(color)
+        }
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        binding.progressBar.visibility = View.GONE
+    }
+
 }

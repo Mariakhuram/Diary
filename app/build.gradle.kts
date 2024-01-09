@@ -4,29 +4,38 @@ plugins {
     //kapt
     id ("kotlin-kapt")
     id ("dagger.hilt.android.plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
-    namespace = "com.mk.diary"
+    namespace = "my.dialy.dairy.journal.dairywithlock"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mk.diary"
+        applicationId = "my.dialy.dairy.journal.dairywithlock"
         minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        getByName("release") {
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro"))
+        }
+
+        getByName("debug") {
+            isDebuggable = true
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro"))
+
         }
     }
     // Enable hilt
@@ -51,10 +60,15 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
+   implementation ("com.onesignal:OneSignal:[5.0.0, 5.99.99]")
     implementation ("com.airbnb.android:lottie:4.1.0")
     //emoji
     implementation("androidx.emoji2:emoji2-emojipicker:1.4.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.firebase:firebase-database-ktx:20.3.0")
+    implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("com.google.firebase:firebase-crashlytics:18.6.0")
+    implementation("com.google.firebase:firebase-analytics:21.5.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -87,6 +101,10 @@ dependencies {
     //swipRefreshlayout
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     //gson
-    implementation ("com.google.code.gson:gson:2.8.8")
-    //lottie
+    implementation ("com.google.code.gson:gson:2.9.0")
+    //zoomage
+    implementation ("com.jsibbold:zoomage:1.3.1")
+    //figner
+    implementation ("androidx.biometric:biometric:1.2.0-alpha03")
+
 }

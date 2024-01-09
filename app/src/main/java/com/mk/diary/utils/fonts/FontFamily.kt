@@ -1,4 +1,4 @@
-package com.mk.mydiary.utils.fonts
+package com.mk.diary.utils.fonts
 
 import android.graphics.Typeface
 import android.os.Bundle
@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.google.android.material.tabs.TabLayout.TabGravity
 
 
 open class FontFamily : Fragment() {

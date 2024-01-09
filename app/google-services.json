@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913555452771",
+    "project_id": "mydairy-68aef",
+    "storage_bucket": "mydairy-68aef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913555452771:android:c493d209fd90c33dfd9956",
+        "android_client_info": {
+          "package_name": "my.dialy.dairy.journal.dairywithlock"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW5nTEbMX7RLWx8clQL_S3tEVRImgdJdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

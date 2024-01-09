@@ -4,8 +4,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.mk.diary.presentation.ui.calendertabs.AprFragment
+import com.mk.diary.presentation.ui.calendertabs.AugFragment
+import com.mk.diary.presentation.ui.calendertabs.DecFragment
 import com.mk.diary.presentation.ui.calendertabs.FebFragment
 import com.mk.diary.presentation.ui.calendertabs.JanFragment
+import com.mk.diary.presentation.ui.calendertabs.JulFragment
+import com.mk.diary.presentation.ui.calendertabs.JunFragment
+import com.mk.diary.presentation.ui.calendertabs.MarFragment
+import com.mk.diary.presentation.ui.calendertabs.MayFragment
+import com.mk.diary.presentation.ui.calendertabs.NovFragment
+import com.mk.diary.presentation.ui.calendertabs.OctFragment
+import com.mk.diary.presentation.ui.calendertabs.SepFragment
 
 class CalenderTabLayoutAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
@@ -13,34 +22,33 @@ class CalenderTabLayoutAdapter(fragmentActivity: FragmentActivity) : FragmentSta
         // Return the total number of fragments
         return 12 // Change this based on the number of tabs
     }
-
     override fun createFragment(position: Int): Fragment {
         // Return the fragment instance for each position
         return when (position) {
-            //31 jan
-            0 -> JanFragment() // Replace with your BackgroundFragment class
+            0 -> DecFragment()
+
+            1 -> JanFragment()
             //feb 28
-            1 -> FebFragment()
+            2 -> FebFragment()
             // mar 31
-            2 -> JanFragment()
+            3 -> MarFragment()
             //apr 30
-            3 -> AprFragment()
+            4 -> AprFragment()
             //may 31
-            4 -> JanFragment()
+            5 -> MayFragment()
             //jun 30
-            5 -> AprFragment()
+            6 -> JunFragment()
             //jul
-            6 -> JanFragment()
+            7 -> JulFragment()
             //aug 31
-            7 -> JanFragment()
+            8 -> AugFragment()
             //sep
-            8 -> AprFragment()
+            9 -> SepFragment()
             //oct 31
-            9 -> JanFragment()
+            10 -> OctFragment()
             //nov 30
-            10 -> AprFragment()
+            11 -> NovFragment()
             //dec 31
-            11 -> JanFragment()
             // Add more cases for additional tabs
             else -> throw IllegalArgumentException("Invalid position: $position")
         }
