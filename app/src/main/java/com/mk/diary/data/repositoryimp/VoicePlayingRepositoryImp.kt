@@ -12,7 +12,6 @@ import javax.inject.Inject
 class VoicePlayingRepositoryImp @Inject constructor():VoicePlayingRepository {
     private val mediaPlayer :MediaPlayer? by lazy {  MediaPlayer() }
     private var currentFilePath: String? = null
-     var isPlaybackComplete = false
     override suspend fun playVoice(context: Context,voice: String,image:ImageView) {
         if (voice == currentFilePath && mediaPlayer?.isPlaying == false) {
             // If the provided data source is the same and the media player is not playing, resume
@@ -44,6 +43,10 @@ class VoicePlayingRepositoryImp @Inject constructor():VoicePlayingRepository {
         mediaPlayer?.pause()
     }
     override suspend fun releaseVoice() {
+    }
+
+    override suspend fun mediaPlayer() {
+
     }
 
 }

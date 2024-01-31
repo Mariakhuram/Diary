@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import com.bumptech.glide.Glide
 import com.mk.diary.adapters.recyclerview.LocalizationRecAdapter
+import com.mk.diary.di.application.HiltApplication
 import com.mk.diary.localization.ForLanguageSettingsClass
 import com.mk.diary.localization.LangCountryModelClass
 import com.mk.diary.localization.SharedPref
@@ -29,16 +30,19 @@ class SelectLanguageFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding= FragmentSelectLanguageBinding.inflate(layoutInflater,container,false)
+        HiltApplication.showPasswordScreen = false
         if (Static.settLang=="SetLan"){
             requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
                 requireContext().newScreen(BottomNavActivity::class.java)
             }
             binding.backBtn.visibility=View.VISIBLE
-
+        }else{
+            requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+               if (SharedPrefObj.getEmail(requireContext())==null){
+                   requireActivity().finishAffinity()
+               }
+            }
         }
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-//
-//        }
         binding.backBtn.setOnClickListener {
             requireContext().newScreen(BottomNavActivity::class.java)
         }
@@ -55,7 +59,6 @@ class SelectLanguageFragment : Fragment() {
             Glide.with(requireContext()).load(model.theme)
                 .into(binding.backGroundTheme)
         }
-
         recyclerView()
         return binding.root
     }

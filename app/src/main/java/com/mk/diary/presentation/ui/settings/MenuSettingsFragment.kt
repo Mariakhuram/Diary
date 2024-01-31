@@ -37,6 +37,31 @@ class MenuSettingsFragment : Fragment() {
         binding= FragmentMenuSettingsBinding.inflate(inflater,container,false)
         viewModel.getSlidingTheme()
         backUpBtn()
+/*
+        binding.backGoogleDriveBtn.setOnClickListener {
+            val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+            if (account == null) {
+                requestUserSignIn()
+            } else {
+                val credential = GoogleAccountCredential.usingOAuth2(
+                    requireContext(),
+                    setOf(DriveScopes.DRIVE_FILE)
+                )
+                credential.selectedAccount = account.account
+
+                val googleDriveService = com.google.api.services.drive.Drive.Builder(
+                    AndroidHttp.newCompatibleTransport(),
+                    GsonFactory(),
+                    credential
+                )
+                    .setApplicationName("AppName")
+                    .build()
+
+                mDriveServiceHelper = DriveServiceHelper(googleDriveService)
+            }
+
+        }
+*/
         binding.deleteCardViewBtn.setOnClickListener {
             findNavController().navigate(R.id.action_menuSettingsFragment_to_deleteDatabaseFragment)
         }
@@ -59,7 +84,6 @@ class MenuSettingsFragment : Fragment() {
             val url = "https://sites.google.com/view/audiodiary/home"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
-
         }
         binding.rateusimage.setOnClickListener {
             binding.rateUsLayoutBtn.visibility=View.VISIBLE
@@ -67,9 +91,6 @@ class MenuSettingsFragment : Fragment() {
 
         binding.rateUSLayout.button.setOnClickListener {
             binding.rateUsLayoutBtn.visibility=View.GONE
-        }
-        binding.rateUSLayout.btnratenow.setOnClickListener {
-
         }
         binding.feedBackBtn.setOnClickListener {
             try {
@@ -152,14 +173,6 @@ class MenuSettingsFragment : Fragment() {
                 }
             }
         }
-    }
-    private fun sendEmail() {
-       try {
-           val emailIntent = Intent(Intent.ACTION_SENDTO)
-           emailIntent.data = Uri.parse("mailt:mehtabali40console@gmail.com")
-           startActivity(emailIntent)
-       }catch (e:Exception){
-       }
     }
     private fun viewModel(){
         binding.appThemeRec.adapter=mAdapter

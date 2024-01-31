@@ -16,26 +16,41 @@ android {
         applicationId = "my.dialy.dairy.journal.dairywithlock"
         minSdk = 23
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
-
+        versionCode = 5
+        versionName = "1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
-
     buildTypes {
-        getByName("release") {
-            isDebuggable = false
+        release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro"))
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            resValue("string", "admobSDKKey", "ca-app-pub-8731080558489121~7896130253")
+            resValue("string", "admobBannerAd", "ca-app-pub-3940256099942544/6300978111")
+            resValue("string", "admobNativeAd", "ca-app-pub-3940256099942544/2247696110")
+            resValue("string", "admobInterstitialAd", "ca-app-pub-3940256099942544/1033173712")
+            resValue("string", "admobRewardAd", "ca-app-pub-3940256099942544/5224354917")
+            resValue("string", "admobRewardAdsInitialID", "ca-app-pub-3940256099942544/5354046379")
+            resValue("string", "admobAppOpenAd", "ca-app-pub-8731080558489121/4481028228")
         }
-
-        getByName("debug") {
-            isDebuggable = true
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro"))
-
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            resValue("string", "admobSDKKey", "ca-app-pub-3940256099942544~3347511713")
+            resValue("string", "admobBannerAd", "ca-app-pub-3940256099942544/6300978111")
+            resValue("string", "admobNativeAd", "ca-app-pub-3940256099942544/2247696110")
+            resValue("string", "admobInterstitialAd", "ca-app-pub-3940256099942544/1033173712")
+            resValue("string", "admobRewardAd", "ca-app-pub-3940256099942544/5224354917")
+            resValue("string", "admobRewardAdsInitialID", "ca-app-pub-3940256099942544/5354046379")
+            resValue("string", "admobAppOpenAd", "ca-app-pub-3940256099942544/9257395921")
         }
     }
     // Enable hilt
@@ -60,7 +75,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
-   implementation ("com.onesignal:OneSignal:[5.0.0, 5.99.99]")
     implementation ("com.airbnb.android:lottie:4.1.0")
     //emoji
     implementation("androidx.emoji2:emoji2-emojipicker:1.4.0")
@@ -69,6 +83,8 @@ dependencies {
     implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.firebase:firebase-crashlytics:18.6.0")
     implementation("com.google.firebase:firebase-analytics:21.5.0")
+    implementation("androidx.lifecycle:lifecycle-process:2.7.0")
+    implementation("com.android.volley:volley:1.2.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -106,5 +122,17 @@ dependencies {
     implementation ("com.jsibbold:zoomage:1.3.1")
     //figner
     implementation ("androidx.biometric:biometric:1.2.0-alpha03")
+    //one sing
+    implementation("com.onesignal:OneSignal:[4.0.0, 4.99.99]")
+    //
+    implementation ("com.facebook.shimmer:shimmer:0.5.0")
+    implementation ("com.google.android.gms:play-services-ads:22.6.0")
+    //
+    implementation ("com.google.android.gms:play-services-auth:16.0.1")
+   /* implementation ("com.google.http-client:google-http-client-gson:1.26.0")
+    implementation("com.google.api-client:google-api-client-android:1.26.0") {
+    }
+    implementation("com.google.apis:google-api-services-drive:v3-rev136-1.25.0") {
+    }*/
 
 }

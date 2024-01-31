@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.PorterDuff
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -13,12 +14,28 @@ import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.mk.diary.AdsImplimentation.NewInsitisialAd
+import com.mk.diary.firebase.FirebaseKey
+import com.mk.diary.firebase.RealtimeFirebaseInstance
 import com.mk.diary.localization.ForLanguageSettingsClass
 import com.mk.diary.presentation.ui.settings.MenuSettingsFragment
+import com.mk.diary.utils.MyConstants
 import com.mk.diary.utils.SharedPrefObj
+import com.mk.diary.utils.appext.shortToast
 import com.mk.diary.utils.companion.Static
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -28,13 +45,18 @@ import my.dialy.dairy.journal.dairywithlock.databinding.ActivityBottomNavBinding
 
 @AndroidEntryPoint
 class BottomNavActivity : AppCompatActivity() {
+    var mInterstitialAd: InterstitialAd? = null
     private lateinit var navController:NavController
     private val splashDuration: Long = 3000 // 2 seconds
     lateinit var binding: ActivityBottomNavBinding
+    private var settingsButtonCLick = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding= ActivityBottomNavBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        MobileAds.initialize(this)
+        loadAd(this)
+        SharedPrefObj.saveAuthToken(this,"USER_TOEKN_SAVED")
         val savedTheme = SharedPrefObj.getAppTheme(this)
         if (savedTheme.color != 0 || savedTheme.theme?.isNotEmpty()==true) {
             Glide.with(this).load(savedTheme.theme)
@@ -54,8 +76,8 @@ class BottomNavActivity : AppCompatActivity() {
             // Your code to handle destination changes goes here
             check(destination)
         }
-        setDefaultColorForIcon(binding.homeFragmentBtn.id)
         binding.homeFragmentBtn.setOnClickListener {
+            settingsButtonCLick = false
             if (!isCurrentFragment(HomeFragment::class.java)) {
                 // Check if the button is not already selected
                 if (!binding.homeFragmentBtn.isSelected) {
@@ -71,6 +93,7 @@ class BottomNavActivity : AppCompatActivity() {
             }
         }
         binding.galleryFragmentBtn.setOnClickListener {
+            settingsButtonCLick = false
             if (!isCurrentFragment(GalleryFragment::class.java)) {
                 // Check if the button is not already selected
                 if (!binding.galleryFragmentBtn.isSelected) {
@@ -86,6 +109,7 @@ class BottomNavActivity : AppCompatActivity() {
             }
         }
         binding.callenderFragmentBtn.setOnClickListener {
+            settingsButtonCLick = false
             if (!isCurrentFragment(CalenderFragment::class.java)) {
                 // Check if the button is not already selected
                 if (!binding.callenderFragmentBtn.isSelected) {
@@ -101,6 +125,7 @@ class BottomNavActivity : AppCompatActivity() {
             }
         }
         binding.menuSettingsFragmentBtn.setOnClickListener {
+            settingsButtonCLick = true
             if (!isCurrentFragment(MenuSettingsFragment::class.java)) {
                 // Check if the button is not already selected
                 if (!binding.menuSettingsFragmentBtn.isSelected) {
@@ -112,14 +137,39 @@ class BottomNavActivity : AppCompatActivity() {
                     binding.homeFragmentBtn.isSelected = false
                     binding.galleryFragmentBtn.isSelected = false
                     binding.callenderFragmentBtn.isSelected = false
+/*
+                    if (mInterstitialAd != null) {
+                        Log.i("shownativead", "ini= show dia")
+                        mInterstitialAd!!.show(this)
+                        mInterstitialAd?.fullScreenContentCallback =
+                            object : FullScreenContentCallback() {
+                                override fun onAdDismissedFullScreenContent() {
+                                    Log.d(NewInsitisialAd.TAG, "onAdDismissedFullScreenContent: ")
+                                    // Don't forget to set the ad reference to null so you
+                                    // don't show the ad a second time.
+                                    mInterstitialAd = null
+                                    loadAd(this@BottomNavActivity)
+                                }
+                                override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                    // Don't forget to set the ad reference to null so you
+                                    // don't show the ad a second time.
+                                    mInterstitialAd = null
+                                }
+                                override fun onAdShowedFullScreenContent() {
+                                    Log.d(NewInsitisialAd.TAG, "onAdShowedFullScreenContent: ")
+                                    // Called when ad is dismissed.
+                                }
+                            }
+                    }
+*/
+
                 }
             }
         }
         // Set up onClickListener for the "Create Note" button
         binding.createNoteFragmentBtn.setOnClickListener {
-            binding.bottomBar.visibility= View.GONE
-            binding.createNoteFragmentBtn.visibility= View.GONE
-            binding.createSecondBtn.visibility= View.GONE
+            settingsButtonCLick = false
+            SharedPrefObj.saveBoolean(this,MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,true)
             findNavController(R.id.fragmentContainerBottomBar).navigate(R.id.createNoteFragment)
         }
         if (Static.settLang=="SetLan"){
@@ -149,6 +199,35 @@ class BottomNavActivity : AppCompatActivity() {
             }
         }
     }
+    fun loadAd(context: Context) {
+        val adRequest = AdRequest.Builder().build()
+        try {
+            // Log.d("interstital id",RemoteConfigs.interstitial_ad_id)
+            InterstitialAd.load(
+                context, context.getString(R.string.admobInterstitialAd), adRequest,
+                object : InterstitialAdLoadCallback() {
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        mInterstitialAd = null
+                    }
+                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                        mInterstitialAd = interstitialAd
+                        Log.d("cvv", "onAdLoaded: ")
+                    }
+                }
+            )
+        } catch (e: Exception) {
+        }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (Static.passwordReset=="Reset" || Static.settLang=="SetLan"){
+
+        }else{
+               setDefaultColorForIcon(binding.homeFragmentBtn.id)
+        }
+    }
     private fun navigate(destinationId: Int) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainerBottomBar) as NavHostFragment
@@ -176,6 +255,7 @@ class BottomNavActivity : AppCompatActivity() {
                 setDefaultColorForIcon(R.id.homeFragment)
                 navigate(R.id.homeFragment)
                 isCurrentFragment(HomeFragment::class.java)
+
             }
             R.id.calenderFragment2, R.id.menuSettingsFragment, R.id.galleryFragment -> {
                 setDefaultColorForIcon(binding.homeFragmentBtn.id)
@@ -317,6 +397,12 @@ class BottomNavActivity : AppCompatActivity() {
             binding.bottomBar.visibility=View.VISIBLE
             binding.createNoteFragmentBtn.visibility=View.VISIBLE
             binding.createSecondBtn.visibility=View.VISIBLE
+            setDefaultColorForIcon(binding.homeFragmentBtn.id)
+            binding.menuSettingsFragmentBtn.isSelected = false
+            // Reset the isSelected state for other buttons
+            binding.homeFragmentBtn.isSelected = true
+            binding.galleryFragmentBtn.isSelected = false
+            binding.callenderFragmentBtn.isSelected = false
             //finish
         }else if (destination.id==R.id.preViewNoteFragment){
             binding.bottomBar.visibility=View.GONE
@@ -334,7 +420,6 @@ class BottomNavActivity : AppCompatActivity() {
             binding.bottomBar.visibility = View.GONE
             binding.createNoteFragmentBtn.visibility = View.GONE
             binding.createSecondBtn.visibility=View.GONE
-
         }else if (destination.id==R.id.appThemeFragment) {
             binding.bottomBar.visibility = View.GONE
             binding.createNoteFragmentBtn.visibility = View.GONE

@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -54,10 +55,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.mk.diary.AdsImplimentation.NewInsitisialAd
 import com.mk.diary.adapters.recyclerview.CreateNoteImageRecyclerAdapter
 import com.mk.diary.adapters.recyclerview.FontColorBottomSheetRecAdapter
 import com.mk.diary.adapters.recyclerview.GalleryImagePickerRecAdapter
@@ -102,6 +110,7 @@ import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
+    var mInterstitialAd: InterstitialAd? = null
     private var voiceName:String?=null
     private var addedVoiceByRecording = true
     private val voicePathList :ArrayList<String> by  lazy { ArrayList() }
@@ -110,7 +119,7 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     private val mVoiceRecAdapter by lazy { VoiceRecodingRecAdapter(voiceModelList) }
     private lateinit var binding: FragmentEditNoteBinding
     val viewModel: NoteViewModel by viewModels()
-    private var checkClick = false
+    private var checkClick = true
     val voicePlayViewModel: VoicePlayingViewModel by viewModels()
     private val voiceRecordingViewModel: VoiceRecordingViewModel by viewModels()
     private val scope = MainScope()
@@ -176,6 +185,7 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentEditNoteBinding.inflate(layoutInflater, container, false)
+        loadAd(requireContext())
         val receivedObject = arguments?.getSerializable(MyConstants.PASS_DATA) as? NoteViewModelClass
         listOfEditTexts.add(binding.titleEd)
         listOfEditTexts.add(binding.descriptionEd)
@@ -215,6 +225,27 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         }
         return binding.root
     }
+    fun loadAd(context: Context) {
+        val adRequest = AdRequest.Builder().build()
+        try {
+            // Log.d("interstital id",RemoteConfigs.interstitial_ad_id)
+            InterstitialAd.load(
+                context, context.getString(R.string.admobInterstitialAd), adRequest,
+                object : InterstitialAdLoadCallback() {
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        mInterstitialAd = null
+                        loadAd(context)
+                    }
+                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                        mInterstitialAd = interstitialAd
+                        Log.d("cvv", "onAdLoaded: ")
+                    }
+                }
+            )
+        } catch (e: Exception) {
+        }
+    }
+
     private fun color(textColor: Int){
         binding.titleEd.setHintTextColor(textColor)
         binding.descriptionEd.setHintTextColor(textColor)
@@ -482,101 +513,37 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         saveBtn.setOnClickListener {
-            binding.bottomBar.visibility=View.GONE
-            binding.preViewBtn.visibility=View.GONE
-            binding.saveNoteAnimation.visibility=View.VISIBLE
-            val mainTitle = binding.titleEd.text.toString()
-            val mainDescription = binding.descriptionEd.text.toString()
-            val model = NoteViewModelClass(
-                modelClass.id,
-                CurrentTime.currentTime,
-                dayOfWeek,
-                date,
-                year,
-                month,
-                createNoteModelList,
-                voiceModelList,
-                voiceDurationList,
-                mainTitle,
-                mainDescription,
-                selectedTextForUnderLine,
-                selectedTextForHighLighting,
-                hashTagList,
-                status,
-                backGroundImage,
-                fontFamily,
-                capitalization,
-                textSize,
-                textColor,
-                gravity,
-            )
-            lifecycleScope.launch {
-                when (val result = viewModel.saveData(model)) {
-                    is ResultCase.Success -> {
-                        // Handle success, if needed
-                        if (checkClick) {
-                            title = null
-                            description = null
-                            textSize = null
-                            textSize = null
-                            emoji = null
-                            status = null
-                            bulletStyle = null
-                            capitalization = null
-                            fontFamily = null
-                            backGroundImage=null
-                            binding.descriptionEd.setText("")
-                            binding.titleEd.setText("")
-                            MyConstants.list.clear()
-                            MyConstants.listOfImageCounting.clear()
-                            CoroutineScope(Dispatchers.Main).launch {
-                                delay(splashDuration)
-                                binding.saveNoteAnimation.visibility=View.GONE
-                                binding.bottomBar.visibility=View.VISIBLE
-                                binding.preViewBtn.visibility=View.VISIBLE
-                                Static.passwordReset=null
-                                Static.settLang=null
-                                requireContext().newScreen(BottomNavActivity::class.java)
+           /* if (mInterstitialAd != null) {
+                binding.showAdDialogue.visibility=View.VISIBLE
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(2000)
+                    binding.showAdDialogue.visibility=View.GONE
+                    mInterstitialAd!!.show(requireActivity())
+                    mInterstitialAd?.fullScreenContentCallback =
+                        object : FullScreenContentCallback() {
+                            override fun onAdDismissedFullScreenContent() {
+                                Log.d(NewInsitisialAd.TAG, "onAdDismissedFullScreenContent: ")
+                                // Don't forget to set the ad reference to null so you
+                                // don't show the ad a second time.
+                                mInterstitialAd = null
+                                loadAd(requireContext())
+                                saveNote(dialog,modelClass)
                             }
-                            dialog.dismiss()
-                        } else {
-                            title = null
-                            description = null
-                            textSize = null
-                            textSize = null
-                            emoji = null
-                            status = null
-                            bulletStyle = null
-                            capitalization = null
-                            fontFamily = null
-                            backGroundImage
-                            MyConstants.list.clear()
-                            MyConstants.listOfImageCounting.clear()
-                            binding.descriptionEd.setText("")
-                            binding.titleEd.setText("")
-                            CoroutineScope(Dispatchers.Main).launch {
-                                delay(splashDuration)
-                                binding.bottomBar.visibility=View.VISIBLE
-                                binding.preViewBtn.visibility=View.VISIBLE
-                                binding.saveNoteAnimation.visibility=View.GONE
-                                Static.passwordReset=null
-                                Static.settLang=null
-                                requireContext().newScreen(BottomNavActivity::class.java)
+                            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                Log.d(NewInsitisialAd.TAG, "onAdFailedToShowFullScreenContent: ")
+                                // Don't forget to set the ad reference to null so you
+                                // don't show the ad a second time.
+                                mInterstitialAd = null
                             }
-                            dialog.dismiss()
+                            override fun onAdShowedFullScreenContent() {
+                                Log.d(NewInsitisialAd.TAG, "onAdShowedFullScreenContent: ")
+                                // Called when ad is dismissed.
+                            }
                         }
-                    }
-
-                    is ResultCase.Error -> {
-                        MyConstants.list.clear()
-                        MyConstants.listOfImageCounting.clear()
-                        // Handle error
-                        requireContext().shortToast(result.message.toString())
-                    }
-                    else -> {
-                    }
                 }
-            }
+            } else {*/
+                saveNote(dialog,modelClass)
+           /* }*/
         }
         cancelBtn.setOnClickListener {
             if (checkClick) {
@@ -592,6 +559,103 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             // Handle the cancel listener if needed
         }
         dialog.show()
+    }
+    private fun saveNote(dialog: BottomSheetDialog,modelClass:NoteViewModelClass){
+        binding.bottomBar.visibility=View.GONE
+        binding.preViewBtn.visibility=View.GONE
+        binding.saveNoteAnimation.visibility=View.VISIBLE
+        val mainTitle = binding.titleEd.text.toString()
+        val mainDescription = binding.descriptionEd.text.toString()
+        val model = NoteViewModelClass(
+            modelClass.id,
+            CurrentTime.currentTime,
+            dayOfWeek,
+            date,
+            year,
+            month,
+            createNoteModelList,
+            voiceModelList,
+            voiceDurationList,
+            mainTitle,
+            mainDescription,
+            selectedTextForUnderLine,
+            selectedTextForHighLighting,
+            hashTagList,
+            status,
+            backGroundImage,
+            fontFamily,
+            capitalization,
+            textSize,
+            textColor,
+            gravity,
+        )
+        lifecycleScope.launch {
+            when (val result = viewModel.saveData(model)) {
+                is ResultCase.Success -> {
+                    // Handle success, if needed
+                    if (checkClick) {
+                        title = null
+                        description = null
+                        textSize = null
+                        textSize = null
+                        emoji = null
+                        status = null
+                        bulletStyle = null
+                        capitalization = null
+                        fontFamily = null
+                        backGroundImage=null
+                        binding.descriptionEd.setText("")
+                        binding.titleEd.setText("")
+                        MyConstants.list.clear()
+                        MyConstants.listOfImageCounting.clear()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(splashDuration)
+                            binding.saveNoteAnimation.visibility=View.GONE
+                            binding.bottomBar.visibility=View.VISIBLE
+                            binding.preViewBtn.visibility=View.VISIBLE
+                            Static.passwordReset=null
+                            Static.settLang=null
+                            requireContext().newScreen(BottomNavActivity::class.java)
+                        }
+                        dialog.dismiss()
+                    } else {
+                        title = null
+                        description = null
+                        textSize = null
+                        textSize = null
+                        emoji = null
+                        status = null
+                        bulletStyle = null
+                        capitalization = null
+                        fontFamily = null
+                        backGroundImage
+                        MyConstants.list.clear()
+                        MyConstants.listOfImageCounting.clear()
+                        binding.descriptionEd.setText("")
+                        binding.titleEd.setText("")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(splashDuration)
+                            binding.bottomBar.visibility=View.VISIBLE
+                            binding.preViewBtn.visibility=View.VISIBLE
+                            binding.saveNoteAnimation.visibility=View.GONE
+                            Static.passwordReset=null
+                            Static.settLang=null
+                            requireContext().newScreen(BottomNavActivity::class.java)
+                        }
+                        dialog.dismiss()
+                    }
+                }
+
+                is ResultCase.Error -> {
+                    MyConstants.list.clear()
+                    MyConstants.listOfImageCounting.clear()
+                    // Handle error
+                    requireContext().shortToast(result.message.toString())
+                }
+                else -> {
+                }
+            }
+        }
     }
     private fun saveNoteViewDataSetup(modelClass: NoteViewModelClass) {
         binding.saveNoteViewBtn.setOnClickListener {
@@ -790,7 +854,23 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         }
         binding.noteViewStatusImage.setOnClickListener { bottomSheetNoteViewStatus() }
         binding.emojiBtn.setOnClickListener { emojiBottomSheet() }
-        binding.imageBtn.setOnClickListener { galleryImagePickerBottomSheet() }
+        binding.imageBtn.setOnClickListener {
+            if (SharedPrefObj.getString(requireContext(),MyConstants.PER_ONE).equals("PER_ONE")){
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).isNullOrEmpty()){
+                    SharedPrefObj.saveString(requireContext(),MyConstants.PER_TWO,"PER_TWO")
+                }
+            }else{
+                SharedPrefObj.saveString(requireContext(),MyConstants.PER_ONE,"PER_ONE")
+            }
+            if (checkAudioPermission()){
+                galleryImagePickerBottomSheet()
+            }else{
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).equals("PER_TWO")){
+                    permissionsFBottomSheet()
+                }
+                askPermissionsForAll()
+            }
+        }
         binding.voiceBtn.setOnClickListener { voiceRecordingBottomSheet() }
         binding.textBtn.setOnClickListener { textFontBottomSheet() }
         binding.backgroundSelectionBtn.setOnClickListener { backGroundThemeBottomSheet() }
@@ -2656,7 +2736,21 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             }
         }
         voicePickBtn.setOnClickListener {
-            openAudioPicker()
+            if (SharedPrefObj.getString(requireContext(),MyConstants.PER_ONE).equals("PER_ONE")){
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).isNullOrEmpty()){
+                    SharedPrefObj.saveString(requireContext(),MyConstants.PER_TWO,"PER_TWO")
+                }
+            }else{
+                SharedPrefObj.saveString(requireContext(),MyConstants.PER_ONE,"PER_ONE")
+            }
+            if (checkAudioPermission()){
+                openAudioPicker()
+            }else{
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).equals("PER_TWO")){
+                    permissionsFBottomSheet()
+                }
+                askPermissionsForAll()
+            }
         }
         cancelBtn.setOnClickListener {
             // Handle the cancel button click
@@ -2677,26 +2771,44 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 builder.dismiss()
                 val named=nameEd.text.toString()
                 if (named.isNotEmpty()){
-                    addedVoiceByRecording = true
-                    voiceName=named
-                    val directory = File(requireContext().filesDir, "audioFiles")
-                    if (!directory.exists()) {
-                        directory.mkdir()
+                    if (SharedPrefObj.getString(requireContext(),MyConstants.PER_ONE).equals("PER_ONE")){
+                        if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).isNullOrEmpty()){
+                            SharedPrefObj.saveString(requireContext(),MyConstants.PER_TWO,"PER_TWO")
+                        }
+                    }else{
+                        SharedPrefObj.saveString(requireContext(),MyConstants.PER_ONE,"PER_ONE")
                     }
-                    audioFilePath = File(directory, named).absolutePath
+                    if (checkAudioPermission()){
+                        addedVoiceByRecording = true
+                        voiceName=named
+                        val directory = File(requireContext().filesDir, "audioFiles")
+                        if (!directory.exists()) {
+                            directory.mkdir()
+                        }
+                        audioFilePath = File(directory, named).absolutePath
 
-                    if (audioFilePath != null) {
-                        // Start recording
-                        startRecordingViewModel(this.audioFilePath!!)
-                        saveBtn.visibility=View.GONE
-                        cancelBtn.visibility=View.GONE
-                        voicePickBtn.visibility=View.GONE
-                        recordingBtn.visibility=View.GONE
-                        title.visibility=View.GONE
-                        recordingTextView.visibility=View.GONE
-                        pickFileTextView.visibility=View.GONE
-                        recordingLayout.visibility=View.VISIBLE
+                        if (audioFilePath != null) {
+                            // Start recording
+                            startRecordingViewModel(this.audioFilePath!!)
+                            saveBtn.visibility=View.GONE
+                            cancelBtn.visibility=View.GONE
+                            voicePickBtn.visibility=View.GONE
+                            recordingBtn.visibility=View.GONE
+                            title.visibility=View.GONE
+                            recordingTextView.visibility=View.GONE
+                            pickFileTextView.visibility=View.GONE
+                            recordingLayout.visibility=View.VISIBLE
 
+                        }
+                    }else{
+                        if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).equals("PER_TWO")){
+                            dialog.dismiss()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(1000)
+                                permissionsFBottomSheet()
+                            }
+                        }
+                        askPermissionsForAll()
                     }
                 }else{
                     nameEd.error="Please enter name"
@@ -2874,6 +2986,36 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         dialog.show()
 
     }
+    private fun permissionsFBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme)
+        val view = layoutInflater.inflate(R.layout.dontsave_noteview_bottom_sheet, null)
+        val cancelBtn = view.findViewById<ConstraintLayout>(R.id.cancelBtn)
+        val saveBtn = view.findViewById<CardView>(R.id.deleteBtn)
+        val notsStatus = view.findViewById<ImageView>(R.id.statusImageview)
+        val title = view.findViewById<TextView>(R.id.title)
+        val desc = view.findViewById<TextView>(R.id.desc)
+        val tv = view.findViewById<TextView>(R.id.btnTV)
+        title.setText(resources.getString(R.string.permissionR))
+        desc.setText(resources.getString(R.string.permissionDesc))
+        tv.setText(resources.getString(R.string.gotosetting))
+        val theme= SharedPrefObj.getAppTheme(requireContext())
+        saveBtn.setCardBackgroundColor(theme.color)
+        cancelBtn.visibility=View.GONE
+        notsStatus.setImageResource(R.drawable.emojifive)
+        // Connect TabLayout and ViewPager2
+        saveBtn.setOnClickListener {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+            intent.data = uri
+            startActivity(intent)
+        }
+        dialog.setCancelable(true)
+        dialog.setContentView(view)
+        dialog.setOnCancelListener {
+            // Handle the cancel listener if needed
+        }
+        dialog.show()
+    }
 
 
     private fun setUpImagesAccordingtoSelection() {
@@ -2911,7 +3053,7 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
             }
         } else {
-            if (checkCameraPermission()) {
+            if (checkAudioPermission()) {
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
             } else {
@@ -2921,19 +3063,30 @@ class EditNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
 
     }
 
-    private fun checkCameraPermission(): Boolean {
+    private fun checkAudioPermission(): Boolean {
         val context = requireContext()
-        val hasCameraPermission =
-            context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Check for both camera and microphone audio permissions on Android 13 and above
-            val hasAudioPermission =
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Check for all required permissions on Android 13 and above
+            val hasRecordAudioPermission =
+                context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            val hasReadMediaAudioPermission =
+                context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+            val hasReadMediaImagesPermission =
                 context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            hasCameraPermission && hasAudioPermission
+
+            hasRecordAudioPermission && hasReadMediaAudioPermission && hasReadMediaImagesPermission
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Check for audio and image permissions on Android 11 and 12
+            val hasAudioPermission =
+                context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            val hasImagePermission =
+                context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+            hasAudioPermission && hasImagePermission
         } else {
-            // Check for camera permission on older Android versions
-            hasCameraPermission
+            // Check for audio permission on older Android versions
+            context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
         }
     }
 

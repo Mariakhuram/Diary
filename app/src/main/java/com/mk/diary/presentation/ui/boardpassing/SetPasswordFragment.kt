@@ -23,7 +23,7 @@ class SetPasswordFragment : Fragment() {
     private val maxImages =4
     private val maxDigits =10
     private val imageViewList = ArrayList<ImageView>()
-    private val listOFPassword:ArrayList<String> by lazy { ArrayList() }
+    private val listPassword:ArrayList<String> by lazy { ArrayList() }
     lateinit var binding: FragmentSetPasswordBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,79 +31,110 @@ class SetPasswordFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding= FragmentSetPasswordBinding.inflate(inflater,container,false)
+        buttonClicks()
         if (SharedPrefObj.getAppTheme(requireContext())!=null){
             val model= SharedPrefObj.getAppTheme(requireContext())
             Glide.with(requireContext()).load(model.theme)
                 .into(binding.backGroundTheme)
         }
         val receivedPassword=arguments?.getStringArrayList(MyConstants.PASS_DATA)
-        imageViewList.addAll(listOf(
-            binding.passCodeOne,
-            binding.passCodeTwo,
-            binding.passCodeThree,
-            binding.passCodeFour
-        ))
-        // Dynamically create ImageViews
-        for (i in 0 until maxImages) {
-            val imageView = ImageView(requireContext())
-            imageView.setImageResource(R.drawable.black_circle_sh)
-            imageViewList.add(imageView)
-            binding.imageViewContainer.addView(imageView)
-        }
-
         // Set onClickListener for each button
-        setButtonClickListeners(receivedPassword)
         // Set onClickListener for back button
         binding.backMinosBtn.setOnClickListener {
             handleBackButtonClick()
+            updateUi()
         }
         return binding.root
     }
-    private fun setButtonClickListeners(receivedPassword: java.util.ArrayList<String>?) {
-        val buttonArray = arrayOf(
-            binding.oneBtn,
-            binding.twoBtn,
-            binding.threeBtn,
-            binding.fourBtn,
-            binding.fiveBtn,
-            binding.sixBtn,
-            binding.sevenBtn,
-            binding.eightBtn,
-            binding.nineBtn,
-            binding.zeroBtn
-        )
+    private fun buttonClicks(){
+        binding.oneBtn.setOnClickListener {
+            addDigit("1")
+        }
+        binding.twoBtn.setOnClickListener {
+            addDigit("2")
+        }
+        binding.threeBtn.setOnClickListener {
+            addDigit("3")
+        }
+        binding.fourBtn.setOnClickListener {
+            addDigit("4")
+        }
+        binding.fiveBtn.setOnClickListener {
+            addDigit("5")
+        }
+        binding.sixBtn.setOnClickListener {
+            addDigit("6")
+        }
+        binding.sevenBtn.setOnClickListener {
+            addDigit("7")
+        }
+        binding.eightBtn.setOnClickListener {
+            addDigit("8")
+        }
+        binding.nineBtn.setOnClickListener {
+            addDigit("9")
+        }
+        binding.zeroBtn.setOnClickListener {
+            addDigit("0")
+        }
+    }
+    private fun addDigit(password: String) {
+        listPassword.add(password)
+        updateUi()
+        val receivedPassword=arguments?.getStringArrayList(MyConstants.PASS_DATA)
+        passwordCheck(receivedPassword)
+    }
+    private fun passwordCheck(receivedPassword: java.util.ArrayList<String>?) {
+        if (listPassword.isNotEmpty()){
+            if (listPassword.size== 4) {
 
-        for (i in 0 until maxDigits) {
-            buttonArray[i].setOnClickListener {
-                handleButtonClick(i + 1,receivedPassword)
+                navigateToNewScreen(listPassword,receivedPassword)
+            } else if (listPassword.size>4){
+                listPassword.clear()
+                showSnackbar(resources.getString(R.string.maxsizePassword))
             }
         }
     }
 
-    private fun handleButtonClick(value: Int, receivedPassword: java.util.ArrayList<String>?) {
-        if (listOFPassword.size < maxImages) {
-            // Adjust value to match the button text (1 to 9, 0)
-            val adjustedValue = if (value == 10) "0" else value.toString()
-
-            listOFPassword.add(adjustedValue)
-
-            val resId = R.drawable.black_cir_sh
-            imageViewList[listOFPassword.size - 1].setImageResource(resId)
-
-            if (listOFPassword.size == maxImages) {
-                // Password is complete, navigate to the new screen
-                navigateToNewScreen(listOFPassword,receivedPassword)
+    private fun updateUi() {
+        binding.passCodeOne.setImageResource(R.drawable.black_circle_sh)
+        binding.passCodeTwo.setImageResource(R.drawable.black_circle_sh)
+        binding.passCodeThree.setImageResource(R.drawable.black_circle_sh)
+        binding.passCodeFour.setImageResource(R.drawable.black_circle_sh)
+        when(listPassword.size){
+            0->{
+                binding.passCodeOne.setImageResource(R.drawable.black_circle_sh)
+                binding.passCodeTwo.setImageResource(R.drawable.black_circle_sh)
+                binding.passCodeThree.setImageResource(R.drawable.black_circle_sh)
+                binding.passCodeFour.setImageResource(R.drawable.black_circle_sh)
             }
-        } else {
+            1->{
+                binding.passCodeOne.setImageResource(R.drawable.black_cir_sh)
 
+            }
+            2->{
+                binding.passCodeOne.setImageResource(R.drawable.black_cir_sh)
+                binding.passCodeTwo.setImageResource(R.drawable.black_cir_sh)
+            }
+            3->{
+                binding.passCodeOne.setImageResource(R.drawable.black_cir_sh)
+                binding.passCodeTwo.setImageResource(R.drawable.black_cir_sh)
+                binding.passCodeThree.setImageResource(R.drawable.black_cir_sh)
+            }
+            4->{
+                binding.passCodeOne.setImageResource(R.drawable.black_cir_sh)
+                binding.passCodeTwo.setImageResource(R.drawable.black_cir_sh)
+                binding.passCodeThree.setImageResource(R.drawable.black_cir_sh)
+                binding.passCodeFour.setImageResource(R.drawable.black_cir_sh)
+            }
         }
-    }    private fun handleBackButtonClick() {
-        if (listOFPassword.isNotEmpty()) {
-            listOFPassword.removeAt(listOFPassword.size - 1)
-
-            val lastEnteredIndex = listOFPassword.size
-            imageViewList[lastEnteredIndex].setImageResource(R.drawable.black_circle_sh)
+    }
+    private fun handleBackButtonClick() {
+        if (listPassword.isNotEmpty()) {
+            listPassword.removeAt(listPassword.size - 1)
+            updateUi()
         } else {
+            showSnackbar(resources.getString(R.string.nodigitstoremove))
         }
     }
 
@@ -115,16 +146,28 @@ class SetPasswordFragment : Fragment() {
         if (SharedPrefObj.getEmail(requireContext())!=null){
             if (Static.passwordReset=="Reset"){
                 if (enteredPassword == receivedPassword?.joinToString(separator = "")) {
-                    SharedPrefObj.savePasswordList(requireContext(), receivedPassword!!)
-                    requireContext().newScreen(BottomNavActivity::class.java)
+                    if (SharedPrefObj.getBoolean(requireContext(),MyConstants.SKIP_TOKEN,false)){
+                        val bundle=Bundle()
+                        bundle.putStringArrayList(MyConstants.PASS_DATA,listOFPassword)
+                        findNavController().navigate(R.id.action_setPasswordFragment_to_passwordVerificationFragment,bundle)
+                    }else{
+                        SharedPrefObj.savePasswordList(requireContext(), receivedPassword!!)
+                        requireContext().newScreen(BottomNavActivity::class.java)
+                    }
                 } else {
                     // Passwords don't match, show a toast
                     showSnackbar(resources.getString(R.string.incorrectPass))
                 }
             }else{
                 if (enteredPassword == receivedPassword?.joinToString(separator = "")) {
-                    SharedPrefObj.savePasswordList(requireContext(), receivedPassword!!)
-                    requireContext().newScreen(BottomNavActivity::class.java)
+                    if (SharedPrefObj.getBoolean(requireContext(),MyConstants.SKIP_TOKEN,false)){
+                        val bundle=Bundle()
+                        bundle.putStringArrayList(MyConstants.PASS_DATA,listOFPassword)
+                        findNavController().navigate(R.id.action_setPasswordFragment_to_passwordVerificationFragment,bundle)
+                    }else{
+                        SharedPrefObj.savePasswordList(requireContext(), receivedPassword!!)
+                        requireContext().newScreen(BottomNavActivity::class.java)
+                    }
                 } else {
                     // Passwords don't match, show a toast
                     showSnackbar(resources.getString(R.string.incorrectPass))
@@ -141,6 +184,12 @@ class SetPasswordFragment : Fragment() {
                 // Passwords don't match, show a toast
                 showSnackbar(resources.getString(R.string.incorrectPass))
             }
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        if (listPassword.isNotEmpty()){
+            listPassword.clear()
         }
     }
     private fun showSnackbar(message: String) {

@@ -13,7 +13,7 @@ import javax.inject.Provider
 
 @Database(
     entities = [NoteViewModelClass::class],
-    version = 1,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(StringArrayListConverter::class,VoiceRecordingModelClassConverter::class)

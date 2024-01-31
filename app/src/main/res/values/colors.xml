@@ -14,6 +14,7 @@
     <color name="hastagColor">#999898</color>
     <color name="red_Smooth">#FD556E</color>
     <color name="d9D9">#D9D9D9</color>
+    <color name="color43">#434343</color>
     <color name="d3d3d">#3D3D3D</color>
     <color name="blackNinePer">#17000000</color>
     <color name="smoothPink">#FFDFDF</color>
@@ -47,6 +48,8 @@
     <color name="color25">#FDDB6D</color>
     <color name="color26">#FDD9B5</color>
     <color name="color27">#EF204E</color>
+
+    <color name="downColor">#80000000</color>
     //themeColors
     <color name="pinkButtonColor">#9F9DFF</color>
     <color name="appTheme1">#00AAF8</color>
@@ -58,6 +61,24 @@
     <color name="appTheme7">#7FBEBF</color>
     <color name="appTheme8">#FFC504</color>
     <color name="appTheme9">#A0C414</color>
+    //
+    <color name="green">#0DFF96</color>
+    <color name="lightTextC">#707070</color>
+    <color name="lightExt">#F9F9F9</color>
+    <color name="yellow">#FFEE00</color>
+    <color name="blueC">#246EDC</color>
+    <color name="blueStroke">#2B59FF</color>
+    <color name="redtext">#FF0000</color>
+    <color name="greenUsed">#17DF00</color>
+    <color name="backgoundSm">#E4E4E4</color>
 
-
+    <color name="lightGray">#F2F2F2</color>
+    <color name="darkGray">#B7B7B7</color>
+    <color name="darkerGray">#807F7F</color>
+    <color name="adsBgColor">#F2F2F2</color>
+    <color name="oragne">#f7a22e</color>
+    <color name="orangeReal">#F19003</color>
+    <color name="gray">#BCBCBC</color>
+    <color name="black_medium">#212121</color>
+    <color name="darkModeColor">#252B37</color>
 </resources>

@@ -15,15 +15,6 @@ class GalleryMainRecyclerAdapter(private var modelList: List<NoteViewModelClass>
     RecyclerView.Adapter<GalleryMainRecyclerAdapter.ViewHolder>() {
 
     private val uniqueDatesSet = mutableSetOf<String>() // Keep track of unique dates
-    private lateinit var click: PassData
-
-    interface PassData {
-        fun clickFunction(modelClass: NoteViewModelClass, position: Int)
-    }
-
-    fun recyclerClick(listener: PassData) {
-        click = listener
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = GalleryRecyclervewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -49,7 +40,7 @@ class GalleryMainRecyclerAdapter(private var modelList: List<NoteViewModelClass>
             })
             holder.binding.title.text = model.date
             holder.itemView.setOnClickListener {
-                click.clickFunction(model, position)
+
             }
         } else {
             // If the date is already in the set, hide the current item

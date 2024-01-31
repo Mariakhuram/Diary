@@ -90,13 +90,15 @@ class NoteViewSearchFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(text: Editable?) {
                 for (item in modelList) {
-                    if (item.mainTitle?.contains(text.toString(), ignoreCase = true) == true ||
-                        item.description?.contains(text.toString(), ignoreCase = true) == true
+                    if (item.mainTitle?.contains(text.toString(), ignoreCase = true) == true
                     ) {
                         filteredItems.clear()
                         filteredItems.add(item)
                     }
                 }
+                mAdapter.filterList(filteredItems,text.toString())
+                mAdapter.notifyDataSetChanged()
+
                 if (filteredItems.isEmpty()){
                     binding.tvResultEmptyLayout.visibility=View.VISIBLE
                     binding.homeRecyclerView.visibility=View.GONE
@@ -104,8 +106,6 @@ class NoteViewSearchFragment : Fragment() {
                     binding.tvResultEmptyLayout.visibility=View.GONE
                     binding.homeRecyclerView.visibility=View.VISIBLE
                 }
-                mAdapter.filterList(filteredItems,text.toString())
-                mAdapter.notifyDataSetChanged()
             }
         })
     }

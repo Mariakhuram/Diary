@@ -47,6 +47,7 @@ class EditPreViewFragment : FontTextSize() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentEditPreViewBinding.inflate(layoutInflater, container, false)
+
         val receivedObject =arguments?.getSerializable(MyConstants.PASS_DATA) as NoteViewModelClass
         binding.backBtn.setOnClickListener {
             fragmentManager?.popBackStack()
@@ -73,6 +74,7 @@ class EditPreViewFragment : FontTextSize() {
         setupPreview(receivedObject)
         return binding.root
     }
+
     private fun voiceRecyclerView() {
         binding.voiceRec.adapter=mVoiceRecAdapter
         mVoiceRecAdapter.recyclerClick(object:VoiceRecodingRecAdapter.PassData{

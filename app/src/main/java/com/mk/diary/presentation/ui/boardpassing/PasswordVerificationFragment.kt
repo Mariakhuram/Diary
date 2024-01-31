@@ -1,6 +1,7 @@
 package com.mk.diary.presentation.ui.boardpassing
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.mk.diary.presentation.ui.tabs.BottomNavActivity
 import com.mk.diary.utils.SharedPrefObj
 import com.mk.diary.utils.MyConstants
+import com.mk.diary.utils.appext.newScreen
+import com.mk.diary.utils.appext.shortToast
+import com.mk.diary.utils.companion.Static
 import dagger.hilt.android.AndroidEntryPoint
 import my.dialy.dairy.journal.dairywithlock.R
 import my.dialy.dairy.journal.dairywithlock.databinding.FragmentPasswordVerificationBinding
@@ -115,7 +120,15 @@ class PasswordVerificationFragment : Fragment() {
                         try {
                             SharedPrefObj.savePasswordList(requireContext(), receivedPassword!!)
                             SharedPrefObj.saveEmail(requireContext(), email)
-                            findNavController().navigate(R.id.action_passwordVerificationFragment_to_getReadyFragment3)
+                            Log.d("notifyValue", "ver: "+SharedPrefObj.getBoolean(requireContext(),MyConstants.SKIP_TOKEN,false))
+                            if(SharedPrefObj.getBoolean(requireContext(),MyConstants.SKIP_TOKEN,false)){
+                                requireContext().newScreen(BottomNavActivity::class.java)
+                                Static.passwordReset = "Reset"
+                                SharedPrefObj.saveBoolean(requireContext(),MyConstants.SKIP_TOKEN,false)
+                            }else{
+                                findNavController().navigate(R.id.action_passwordVerificationFragment_to_getReadyFragment3)
+                                SharedPrefObj.saveBoolean(requireContext(),MyConstants.SKIP_TOKEN,false)
+                            }
                         } catch (e: Exception) {
                             // Handle exception if needed
                         }

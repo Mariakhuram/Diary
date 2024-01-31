@@ -21,8 +21,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -41,6 +43,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
@@ -53,15 +56,24 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.example.a4glite.AdsImplimentation.StaticClass
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.mk.diary.AdsImplimentation.NewInsitisialAd
 import com.mk.diary.adapters.recyclerview.CreateNoteImageRecyclerAdapter
 import com.mk.diary.adapters.recyclerview.FontColorBottomSheetRecAdapter
 import com.mk.diary.adapters.recyclerview.GalleryImagePickerRecAdapter
 import com.mk.diary.adapters.recyclerview.HashTagRecyclerAdapter
 import com.mk.diary.adapters.recyclerview.VoiceRecodingRecAdapter
 import com.mk.diary.adapters.tabslayout.BackgroundThemeTabLayoutAdapter
+import com.mk.diary.di.application.HiltApplication
 import com.mk.diary.domain.models.ImageItem
 import com.mk.diary.domain.models.NoteViewModelClass
 import com.mk.diary.domain.models.VoiceRecordingModelClass
@@ -96,9 +108,11 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.collections.groupBy as groupBy1
 
 @AndroidEntryPoint
 class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
+    var minterstitialAd: InterstitialAd? = null
     private val voiceModelList :ArrayList<VoiceRecordingModelClass> by  lazy { ArrayList() }
     private val mVoiceRecAdapter by lazy { VoiceRecodingRecAdapter(voiceModelList) }
     private val voicePathList :ArrayList<String> by  lazy { ArrayList() }
@@ -166,11 +180,19 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     var description:String?=null
     private var durationOfVoice:String?=null
     private val coordinatorViewModel: CoordinatorViewModel by activityViewModels()
+    private val requestMultiplePermissionsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            handlePermissionsResult(permissions)
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentCreateNoteBinding.inflate(layoutInflater, container, false)
+        loadAd(requireContext())
+        Static.passwordReset=null
+        Static.settLang=null
         Static.checkBolean = false
         dateView()
         setUpImagesAccordingtoSelection()
@@ -198,7 +220,42 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         voiceRecyclerView()
         return binding.root
     }
+    fun loadAd(context: Context) {
+        val adRequest = AdRequest.Builder().build()
+        try {
+            // Log.d("interstital id",RemoteConfigs.interstitial_ad_id)
+            InterstitialAd.load(
+                context, context.getString(R.string.admobInterstitialAd), adRequest,
+                object : InterstitialAdLoadCallback() {
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
 
+                        minterstitialAd = null
+                        loadAd(context)
+
+                    }
+                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                        minterstitialAd = interstitialAd
+                        Log.d("cvv", "onAdLoaded: ")
+                    }
+                }
+            )
+        } catch (e: Exception) {
+
+
+        }
+
+    }
+
+    private fun handlePermissionsResult(permissions: Map<String, Boolean>) {
+        if (permissions.all { it.value }) {
+            // All permissions are granted
+
+
+        } else {
+            // At least one permission is denied
+
+        }
+    }
     private fun isUserForFirstTimeShowTips() {
         if (SharedPrefObj.getString(requireContext(), MyConstants.USER_TIPS).isNullOrEmpty()){
             binding.tipAnimationBtn.visibility=View.VISIBLE
@@ -285,6 +342,10 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
     }
     override fun onResume() {
         super.onResume()
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(2000)
+            HiltApplication.showPasswordScreen = true
+        }
         if (backGroundImage!=null){
             Glide.with(requireContext()).load(backGroundImage).into(binding.backGround)
         }
@@ -383,97 +444,37 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         saveBtn.setOnClickListener {
-            binding.bottomBar.visibility=View.GONE
-            binding.preViewBtn.visibility=View.GONE
-            binding.saveNoteAnimation.visibility=View.VISIBLE
-            val mainTitle = binding.titleEd.text.toString()
-            val mainDescription = binding.descriptionEd.text.toString()
-            val model = NoteViewModelClass(
-                0,
-                CurrentTime.currentTime,
-                dayOfWeek,
-                date,
-                year,
-                month,
-                createNoteModelList,
-                voiceModelList,
-                voiceDurationList,
-                mainTitle,
-                mainDescription,
-                selectedTextForUnderLine,
-                selectedTextForHighLighting,
-                hashTagList,
-                status,
-                backGroundImage,
-                fontFamily,
-                capitalization,
-                textSize,
-                textColor,
-                gravity,
-            )
-            lifecycleScope.launch {
-                when (val result = viewModel.saveData(model)) {
-                    is ResultCase.Success -> {
-                        // Handle success, if needed
-                        if (checkClick) {
-                            title = null
-                            description = null
-                            textSize = null
-                            textSize = null
-                            emoji = null
-                            status = null
-                            bulletStyle = null
-                            capitalization = null
-                            fontFamily = null
-                            backGroundImage=null
-                            binding.descriptionEd.setText("")
-                            binding.titleEd.setText("")
-                            MyConstants.list.clear()
-                            MyConstants.listOfImageCounting.clear()
-                            CoroutineScope(Dispatchers.Main).launch {
-                                delay(splashDuration)
-                                binding.saveNoteAnimation.visibility=View.GONE
-                                binding.bottomBar.visibility=View.VISIBLE
-                                binding.preViewBtn.visibility=View.VISIBLE
-                                requireContext().newScreen(BottomNavActivity::class.java)
+            /*if (minterstitialAd != null) {
+                binding.showAdDialogue.visibility=View.VISIBLE
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(2000)
+                    binding.showAdDialogue.visibility=View.GONE
+                    minterstitialAd!!.show(requireActivity())
+                    minterstitialAd?.fullScreenContentCallback =
+                        object : FullScreenContentCallback() {
+                            override fun onAdDismissedFullScreenContent() {
+                                Log.d(NewInsitisialAd.TAG, "onAdDismissedFullScreenContent: ")
+                                // Don't forget to set the ad reference to null so you
+                                // don't show the ad a second time.
+                                minterstitialAd = null
+                                loadAd(requireContext())
+                                saveNote(dialog)
                             }
-                            dialog.dismiss()
-                        } else {
-                            title = null
-                            description = null
-                            textSize = null
-                            textSize = null
-                            emoji = null
-                            status = null
-                            bulletStyle = null
-                            capitalization = null
-                            fontFamily = null
-                            backGroundImage
-                            MyConstants.list.clear()
-                            MyConstants.listOfImageCounting.clear()
-                            binding.descriptionEd.setText("")
-                            binding.titleEd.setText("")
-                            CoroutineScope(Dispatchers.Main).launch {
-                                delay(splashDuration)
-                                binding.bottomBar.visibility=View.VISIBLE
-                                binding.preViewBtn.visibility=View.VISIBLE
-                                binding.saveNoteAnimation.visibility=View.GONE
-                                requireContext().newScreen(BottomNavActivity::class.java)
+                            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                                Log.d(NewInsitisialAd.TAG, "onAdFailedToShowFullScreenContent: ")
+                                // Don't forget to set the ad reference to null so you
+                                // don't show the ad a second time.
+                                minterstitialAd = null
                             }
-                            dialog.dismiss()
+                            override fun onAdShowedFullScreenContent() {
+                                Log.d(NewInsitisialAd.TAG, "onAdShowedFullScreenContent: ")
+                                // Called when ad is dismissed.
+                            }
                         }
-                    }
-
-                    is ResultCase.Error -> {
-                        MyConstants.list.clear()
-                        MyConstants.listOfImageCounting.clear()
-                        // Handle error
-                        requireContext().shortToast(result.message.toString())
-                    }
-                    else -> {
-                    }
                 }
-            }
+            } else {*/
+                saveNote(dialog)
+          //  }
         }
         cancelBtn.setOnClickListener {
             if (checkClick) {
@@ -489,6 +490,100 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             // Handle the cancel listener if needed
         }
         dialog.show()
+    }
+    private fun saveNote(dialog: BottomSheetDialog){
+        SharedPrefObj.saveBoolean(requireContext(),MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,false)
+        binding.bottomBar.visibility=View.GONE
+        binding.preViewBtn.visibility=View.GONE
+        binding.saveNoteAnimation.visibility=View.VISIBLE
+        val mainTitle = binding.titleEd.text.toString()
+        val mainDescription = binding.descriptionEd.text.toString()
+        val model = NoteViewModelClass(
+            0,
+            CurrentTime.currentTime,
+            dayOfWeek,
+            date,
+            year,
+            month,
+            createNoteModelList,
+            voiceModelList,
+            voiceDurationList,
+            mainTitle,
+            mainDescription,
+            selectedTextForUnderLine,
+            selectedTextForHighLighting,
+            hashTagList,
+            status,
+            backGroundImage,
+            fontFamily,
+            capitalization,
+            textSize,
+            textColor,
+            gravity,
+        )
+        lifecycleScope.launch {
+            when (val result = viewModel.saveData(model)) {
+                is ResultCase.Success -> {
+                    // Handle success, if needed
+                    if (checkClick) {
+                        title = null
+                        description = null
+                        textSize = null
+                        textSize = null
+                        emoji = null
+                        status = null
+                        bulletStyle = null
+                        capitalization = null
+                        fontFamily = null
+                        backGroundImage=null
+                        binding.descriptionEd.setText("")
+                        binding.titleEd.setText("")
+                        MyConstants.list.clear()
+                        MyConstants.listOfImageCounting.clear()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(splashDuration)
+                            binding.saveNoteAnimation.visibility=View.GONE
+                            binding.bottomBar.visibility=View.VISIBLE
+                            binding.preViewBtn.visibility=View.VISIBLE
+                            requireContext().newScreen(BottomNavActivity::class.java)
+                        }
+                        dialog.dismiss()
+                    } else {
+                        title = null
+                        description = null
+                        textSize = null
+                        textSize = null
+                        emoji = null
+                        status = null
+                        bulletStyle = null
+                        capitalization = null
+                        fontFamily = null
+                        backGroundImage
+                        MyConstants.list.clear()
+                        MyConstants.listOfImageCounting.clear()
+                        binding.descriptionEd.setText("")
+                        binding.titleEd.setText("")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(splashDuration)
+                            binding.bottomBar.visibility=View.VISIBLE
+                            binding.preViewBtn.visibility=View.VISIBLE
+                            binding.saveNoteAnimation.visibility=View.GONE
+                            requireContext().newScreen(BottomNavActivity::class.java)
+                        }
+                        dialog.dismiss()
+                    }
+                }
+
+                is ResultCase.Error -> {
+                    MyConstants.list.clear()
+                    MyConstants.listOfImageCounting.clear()
+                    // Handle error
+                    requireContext().shortToast(result.message.toString())
+                }
+                else -> {
+                }
+            }
+        }
     }
     private fun saveNoteViewDataSetup() {
         binding.saveNoteViewBtn.setOnClickListener {
@@ -521,8 +616,6 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             requireContext(),
             Manifest.permission.READ_MEDIA_IMAGES
         )
-        val recordAudio =
-            ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
         if (mediaAudioAccess == PackageManager.PERMISSION_DENIED || mediaImageAccess == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(
                 requireActivity(),
@@ -532,7 +625,12 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 ),
                 REQUEST_CODE_PERMISSIONS_ANDROID_13
             )
+            requestMultiplePermissionsLauncher.launch(arrayOf(
+                Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.RECORD_AUDIO
+            ))
         }
+
     }
     private fun askPermissionsForAndroid11AndAbove() {
         val readExternalStorageAccess = ActivityCompat.checkSelfPermission(
@@ -576,6 +674,8 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 ),
                 REQUEST_CODE_PERMISSIONS_ANDROID_6
             )
+        }else{
+
         }
     }
     private fun showDatePicker() {
@@ -666,7 +766,23 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         }
         binding.noteViewStatusImage.setOnClickListener { bottomSheetNoteViewStatus() }
         binding.emojiBtn.setOnClickListener { emojiBottomSheet() }
-        binding.imageBtn.setOnClickListener { galleryImagePickerBottomSheet() }
+        binding.imageBtn.setOnClickListener {
+            if (SharedPrefObj.getString(requireContext(),MyConstants.PER_ONE).equals("PER_ONE")){
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).isNullOrEmpty()){
+                    SharedPrefObj.saveString(requireContext(),MyConstants.PER_TWO,"PER_TWO")
+                }
+            }else{
+                SharedPrefObj.saveString(requireContext(),MyConstants.PER_ONE,"PER_ONE")
+            }
+            if (checkAudioPermissions()){
+                galleryImagePickerBottomSheet()
+            }else{
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).equals("PER_TWO")){
+                    permissionsFBottomSheet()
+                }
+                askPermissionsForAll()
+            }
+        }
         binding.voiceBtn.setOnClickListener { voiceRecordingBottomSheet() }
         binding.textBtn.setOnClickListener { textFontBottomSheet() }
         binding.backgroundSelectionBtn.setOnClickListener { backGroundThemeBottomSheet() }
@@ -2558,7 +2674,21 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
             }
         }
         voicePickBtn.setOnClickListener {
-            openAudioPicker()
+            if (SharedPrefObj.getString(requireContext(),MyConstants.PER_ONE).equals("PER_ONE")){
+                if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).isNullOrEmpty()){
+                    SharedPrefObj.saveString(requireContext(),MyConstants.PER_TWO,"PER_TWO")
+                }
+            }else{
+                SharedPrefObj.saveString(requireContext(),MyConstants.PER_ONE,"PER_ONE")
+            }
+           if (checkAudioPermissions()){
+               openAudioPicker()
+           }else{
+               if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).equals("PER_TWO")){
+                   permissionsFBottomSheet()
+               }
+               askPermissionsForAll()
+           }
         }
         cancelBtn.setOnClickListener {
             // Handle the cancel button click
@@ -2579,26 +2709,45 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
                 builder.dismiss()
                 val named=nameEd.text.toString()
                 if (named.isNotEmpty()){
-                    addedVoiceByRecording = true
-                    voiceName=named
-                    val directory = File(requireContext().filesDir, "audioFiles")
-                    if (!directory.exists()) {
-                        directory.mkdir()
+
+                    if (SharedPrefObj.getString(requireContext(),MyConstants.PER_ONE).equals("PER_ONE")){
+                        if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).isNullOrEmpty()){
+                            SharedPrefObj.saveString(requireContext(),MyConstants.PER_TWO,"PER_TWO")
+                        }
+                    }else{
+                        SharedPrefObj.saveString(requireContext(),MyConstants.PER_ONE,"PER_ONE")
                     }
-                    audioFilePath = File(directory, named).absolutePath
+                    if (checkAudioPermissions()){
+                        addedVoiceByRecording = true
+                        voiceName=named
+                        val directory = File(requireContext().filesDir, "audioFiles")
+                        if (!directory.exists()) {
+                            directory.mkdir()
+                        }
+                        audioFilePath = File(directory, named).absolutePath
 
-                    if (audioFilePath != null) {
-                        // Start recording
-                        startRecordingViewModel(this.audioFilePath!!)
-                        saveBtn.visibility=View.GONE
-                        cancelBtn.visibility=View.GONE
-                        voicePickBtn.visibility=View.GONE
-                        recordingBtn.visibility=View.GONE
-                        title.visibility=View.GONE
-                        recordingTextView.visibility=View.GONE
-                        pickFileTextView.visibility=View.GONE
-                        recordingLayout.visibility=View.VISIBLE
+                        if (audioFilePath != null) {
+                            // Start recording
+                            startRecordingViewModel(this.audioFilePath!!)
+                            saveBtn.visibility=View.GONE
+                            cancelBtn.visibility=View.GONE
+                            voicePickBtn.visibility=View.GONE
+                            recordingBtn.visibility=View.GONE
+                            title.visibility=View.GONE
+                            recordingTextView.visibility=View.GONE
+                            pickFileTextView.visibility=View.GONE
+                            recordingLayout.visibility=View.VISIBLE
 
+                        }
+                    }else{
+                        if (SharedPrefObj.getString(requireContext(),MyConstants.PER_TWO).equals("PER_TWO")){
+                            dialog.dismiss()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                delay(1000)
+                                permissionsFBottomSheet()
+                            }
+                        }
+                        askPermissionsForAll()
                     }
                 }else{
                     nameEd.error="Please enter name"
@@ -2787,43 +2936,55 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
 
 
     private fun captureImage() {
+        HiltApplication.showPasswordScreen = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val context = requireContext()
-            val contentResolver = context.contentResolver
-            val hasCameraPermission =
-                context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-
-            if (hasCameraPermission) {
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
-            } else {
-                requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
-            }
         } else {
-            if (checkCameraPermission()) {
+            if (checkAudioPermissions()) {
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 startActivityForResult(cameraIntent, CAMERA_REQUEST_CODE)
             } else {
-                requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE)
+
             }
         }
 
     }
 
-    private fun checkCameraPermission(): Boolean {
+    private fun checkAudioPermissions(): Boolean {
         val context = requireContext()
-        val hasCameraPermission =
-            context.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Check for both camera and microphone audio permissions on Android 13 and above
-            val hasAudioPermission =
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Check for all required permissions on Android 13 and above
+            val hasRecordAudioPermission =
+                context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            val hasReadMediaAudioPermission =
+                context.checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED
+            val hasReadMediaImagesPermission =
                 context.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            hasCameraPermission && hasAudioPermission
+
+            hasRecordAudioPermission && hasReadMediaAudioPermission && hasReadMediaImagesPermission
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Check for audio and image permissions on Android 11 and 12
+            val hasAudioPermission =
+                context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+
+            hasAudioPermission
         } else {
-            // Check for camera permission on older Android versions
-            hasCameraPermission
+            // Check for audio permission on older Android versions
+            context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
         }
+    }
+
+
+    private fun handlePermissionDeniedWithExplanation(explainedPermissions: List<String>) {
+        // Handle the case where permissions are denied with explanation
+        // You may want to redirect the user to app settings or show a custom explanation
+    }
+
+    private fun handleAllPermissionsGranted() {
+        // Handle the case where all requested permissions are granted
+        // Proceed with your logic or operations that require the permissions
     }
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -2831,37 +2992,51 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode==REQUEST_CODE_PERMISSIONS_ANDROID_13){
+            if (grantResults.all { it==PackageManager.PERMISSION_GRANTED }){
+            //    requireContext().shortToast("Granted")
+            }else{
+            //    requireContext().shortToast("Denied")
+            }
+        }
         if (requestCode == REQUEST_CODE_PERMISSIONS_ANDROID_6
         ) {
+
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 // All permissions granted, proceed with the operation
                 galleryImagePickerBottomSheet()
             } else {
                 // Permissions not granted, handle accordingly
-                Toast.makeText(context, "Permissions denied", Toast.LENGTH_SHORT).show()
             }
         } else if (requestCode == REQUEST_CODE_PERMISSIONS_ANDROID_11) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 // All permissions granted, proceed with the operation
                 galleryImagePickerBottomSheet()
+         //       requireContext().shortToast("Granted")
             } else {
+           //     requireContext().shortToast("Denied")
                 // Permissions not granted, handle accordingly
-                Toast.makeText(context, "Permissions denied", Toast.LENGTH_SHORT).show()
             }
         } else if (requestCode == REQUEST_CODE_PERMISSIONS_ANDROID_13) {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 // All permissions granted, proceed with the operation
                 galleryImagePickerBottomSheet()
+            //    requireContext().shortToast("Granted")
+
             } else {
-                // Permissions not granted, handle accordingly
-                Toast.makeText(context, "Permissions denied", Toast.LENGTH_SHORT).show()
+            //    requireContext().shortToast("Denied")
+                // Permissions not granted, handle accordingl
+
             }
         }else if (requestCode==CAMERA_REQUEST_CODE){
             captureImage()
         }else if (requestCode==PICK_AUDIO_REQUEST_CODE){
+
         }
     }
+
     private fun openAudioPicker() {
+        HiltApplication.showPasswordScreen = false
         try {
             val intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "audio/*"
@@ -3058,11 +3233,42 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         return imageList
     }
     private fun checkUserStatus() {
-        val hasSeenBottomSheet = SharedPrefObj.getBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET, false)
-        if (!hasSeenBottomSheet) {
+        if (SharedPrefObj.getBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET, false)) {
             bottomSheetNoteViewStatus()
         }
     }
+    private fun permissionsFBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme)
+        val view = layoutInflater.inflate(R.layout.dontsave_noteview_bottom_sheet, null)
+        val cancelBtn = view.findViewById<ConstraintLayout>(R.id.cancelBtn)
+        val saveBtn = view.findViewById<CardView>(R.id.deleteBtn)
+        val notsStatus = view.findViewById<ImageView>(R.id.statusImageview)
+        val title = view.findViewById<TextView>(R.id.title)
+        val desc = view.findViewById<TextView>(R.id.desc)
+        val tv = view.findViewById<TextView>(R.id.btnTV)
+        title.setText(resources.getString(R.string.permissionR))
+        desc.setText(resources.getString(R.string.permissionDesc))
+        tv.setText(resources.getString(R.string.gotosetting))
+        val theme= SharedPrefObj.getAppTheme(requireContext())
+        saveBtn.setCardBackgroundColor(theme.color)
+        cancelBtn.visibility=View.GONE
+        notsStatus.setImageResource(R.drawable.emojifive)
+        // Connect TabLayout and ViewPager2
+        saveBtn.setOnClickListener {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri: Uri = Uri.fromParts("package", requireContext().packageName, null)
+            intent.data = uri
+            startActivity(intent)
+        }
+        dialog.setCancelable(true)
+        dialog.setContentView(view)
+        dialog.setOnCancelListener {
+            // Handle the cancel listener if needed
+        }
+        dialog.show()
+    }
+
+
     private fun bottomSheetNoteViewStatus() {
         val dialog = BottomSheetDialog(requireContext(), R.style.AppBottomSheetDialogTheme)
         val view = layoutInflater.inflate(R.layout.bottom_sheet_noteview_status, null)
@@ -3080,11 +3286,14 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         saveBtn.setCardBackgroundColor(theme.color)
         // Connect TabLayout and ViewPager2
         saveBtn.setOnClickListener {
+            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,false)
+
             status?.let { it1 -> binding.noteViewStatusImage.setImageResource(it1) }
             // Handle the cancel button click
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
         }
         cancelBtn.setOnClickListener {
+            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,false)
             // Handle the cancel button click
             dialog.dismiss() // Dismiss the dialog when the cancel button is clicked
 //            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET, true)
@@ -3180,7 +3389,7 @@ class CreateNoteFragment : FontTextSize(),DatePickerDialog.OnDateSetListener {
         dialog.setCancelable(true)
         dialog.setContentView(view)
         dialog.setOnCancelListener {
-            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,true)
+            SharedPrefObj.saveBoolean(requireContext(), MyConstants.KEY_HAS_SEEN_BOTTOM_SHEET,false)
             // Handle the cancel listener if needed
         }
         dialog.show()

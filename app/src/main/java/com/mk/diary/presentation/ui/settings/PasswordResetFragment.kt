@@ -13,6 +13,8 @@ import com.mk.diary.presentation.ui.boardpassing.BoardPassActivity
 import com.mk.diary.utils.MyConstants
 import com.mk.diary.utils.SharedPrefObj
 import com.mk.diary.utils.companion.Static
+
+import com.mk.diary.utils.companion.Static.PASSWORD_CHANGE
 import dagger.hilt.android.AndroidEntryPoint
 import my.dialy.dairy.journal.dairywithlock.R
 import my.dialy.dairy.journal.dairywithlock.databinding.FragmentPasswordResetBinding
@@ -133,10 +135,11 @@ class PasswordResetFragment : Fragment() {
                     ?.joinToString(separator = "")
             ) {
                 // Passwords match, do something (e.g., navigate to a success screen)
-                SharedPrefObj.removePasswordList(requireContext())
+               // SharedPrefObj.removePasswordList(requireContext())
                 val i = Intent(requireContext(), BoardPassActivity::class.java)
                 i.putExtra(MyConstants.PASS_DATA, "P")
                 Static.passwordReset = "Reset"
+                PASSWORD_CHANGE = true
                 startActivity(i)
             } else {
                 showSnackbar("Incorrect password. Please try again.")

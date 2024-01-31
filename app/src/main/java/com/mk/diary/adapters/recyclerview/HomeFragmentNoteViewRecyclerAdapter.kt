@@ -52,16 +52,16 @@ class HomeFragmentNoteViewRecyclerAdapter(private var modelList: List<NoteViewMo
         holder.binding.dateTv.text=model.date
         holder.binding.dayTv.text=model.dayOfWeek
         holder.binding.monthYearTv.text="${model.monthString} ${model.year}"
-        if (!model.description.isNullOrEmpty()){
+        if (model.mainTitle?.isNotEmpty()==true){
             holder.binding.descriptionEd.visibility=View.VISIBLE
-            holder.binding.descriptionEd.text=model.description
+            holder.binding.descriptionEd.text=model.mainTitle
         }
         if (!searchedText.isNullOrEmpty()) {
-            if (model.description?.contains(searchedText!!) == true) {
-                val spannableString = SpannableStringBuilder(model.description)
+            if (model.mainTitle?.contains(searchedText!!) == true) {
+                val spannableString = SpannableStringBuilder(model.mainTitle)
                 var startIndex = 0
-                while (startIndex < model.description.length && startIndex >= 0) {
-                    startIndex = model.description.indexOf(searchedText!!, startIndex)
+                while (startIndex < model.mainTitle.length && startIndex >= 0) {
+                    startIndex = model.mainTitle.indexOf(searchedText!!, startIndex)
                     if (startIndex >= 0) {
                         val endIndex = startIndex + searchedText!!.length
                         spannableString.setSpan(
@@ -79,10 +79,10 @@ class HomeFragmentNoteViewRecyclerAdapter(private var modelList: List<NoteViewMo
                         startIndex = endIndex
                     }
                 }
-                holder.binding.descriptionEd.setText(spannableString)
+                holder.binding.descriptionEd.text = spannableString
             }
         } else {
-            holder.binding.descriptionEd.text = model.description
+            holder.binding.descriptionEd.text = model.mainTitle
         }
         if (model.noteViewStatus!=null){
             holder.binding.noteViewStatusCard.visibility=View.VISIBLE

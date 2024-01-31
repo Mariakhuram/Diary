@@ -19,4 +19,37 @@
         <item name="android:windowBackground">@drawable/rounded_ten</item>
     </style>
     <style name="Theme.Diary" parent="Base.Theme.Diary" />
+    <style name="FullScreenDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+    <style name="AdsButtonShapeAppearance">
+        <item name="cornerSizeTopLeft">32dp</item>
+        <item name="cornerSizeTopRight">32dp</item>
+        <item name="cornerSizeBottomLeft">32dp</item>
+        <item name="cornerSizeBottomRight">32dp</item>
+    </style>
+
+    <style name="AdsButtonShapeMediumAppearance">
+        <item name="cornerSizeTopLeft">10dp</item>
+        <item name="cornerSizeTopRight">10dp</item>
+        <item name="cornerSizeBottomLeft">10dp</item>
+        <item name="cornerSizeBottomRight">10dp</item>
+    </style>
+
+    <style name="AdsButtonStyleMedium" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/greenUsed</item>
+        <item name="rippleColor">@color/gray</item>
+        <item name="shapeAppearance">@style/AdsButtonShapeMediumAppearance</item>
+    </style>
+    <style name="AdsButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/greenUsed</item>
+        <item name="rippleColor">@color/gray</item>
+        <item name="shapeAppearance">@style/AdsButtonShapeAppearance</item>
+    </style>
 </resources>

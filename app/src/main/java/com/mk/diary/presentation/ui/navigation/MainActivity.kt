@@ -34,5 +34,4 @@ class MainActivity : AppCompatActivity() {
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase?.let { ForLanguageSettingsClass.onAttach(it) })
     }
-
 }

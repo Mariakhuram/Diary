@@ -1,13 +1,11 @@
 package com.mk.diary.data.repositoryimp
 
-import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.mk.diary.domain.repository.BackgroundThemeRepository
 import com.mk.diary.firebase.FirebaseKey
 import com.mk.diary.firebase.RealtimeFirebaseInstance
-import com.mk.diary.helpers.ResultCase
 import kotlinx.coroutines.CompletableDeferred
 import javax.inject.Inject
 
@@ -27,14 +25,12 @@ class BackgroundThemeRepositoryImp @Inject constructor() : BackgroundThemeReposi
                     }
                     defered.complete(list)
                 }
-
                 override fun onCancelled(error: DatabaseError) {
                     defered.completeExceptionally(error.toException())
                 }
             })
         return defered.await()
     }
-
     override suspend fun holidayImages(): List<String> {
         val list = mutableListOf<String>()
         val defered = CompletableDeferred<List<String>>()

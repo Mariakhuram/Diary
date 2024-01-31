@@ -23,7 +23,7 @@
     <string name="saveandsecure">Save and Secure</string>
     <string name="letsgo">Let\'s Go!</string>
     <string name="letsstart">Let\'s start!</string>
-    <string name="setpasscode">Set Passcode</string>
+    <string name="setpasscode">Enter Passcode</string>
 
     <string name="getReady">Get Ready</string>
     <string name="welcome">Welcome!</string>
@@ -123,5 +123,11 @@ preseriving.</string>
     <string name="didyouforgottoaddnewPassword">Did you forgot to add new \n Password?</string>
     <string name="biomatrichAuth">"Biometric Authentication</string>
     <string name="biomatrichAuthDsc">Log in using your biometric credential</string>
+    <string name="permissionR">Permission Required</string>
+    <string name="permissionDesc">We need to access your gallery to import
+photos &amp; Voice</string>
+    <string name="gotosetting">Go to setting</string>
+    <string name="retry">Retry</string>
+    <string name="google_Drive_Api" translatable="false">AIzaSyCbXAJyqzvnkcXoUE0cZtuUw69hRwxEyYw</string>
 
 </resources>

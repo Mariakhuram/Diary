@@ -11,6 +11,11 @@ object MyConstants {
     const val KEY_HAS_SEEN_BOTTOM_SHEET = "has_seen_bottom_sheet"
     const val GRAVITY="GRAVITY"
     const val TOKEN="TOKEN"
+    const val FIRST_TIME_APP_OPEN_AD="FIRST_TIME_APP_OPEN_AD"
+    const val FIRST_TIME_HOME_AD="FIRST_TIME_HOME_AD"
+    const val SKIP_TOKEN="SKIP_TOKEN"
+    const val SKIPPED_PASSCODE="SKIPPED_PASSCODE"
+    const val NOT_SKIPPED="NOT_SKIPPED"
     const val FINGERPRINT_TOKEN="FINGERPRINT_TOKEN"
     const val USER_AUTH_TOKEN="USER_AUTH_TOKEN"
     const val ALL_CAPITAL="ALL_CAPITAL"
@@ -56,6 +61,9 @@ object MyConstants {
     const val LANG="LANG"
     const val FINISH_FRAGMENT="FINISH_FRAGMENT"
     const val USER_TIPS="USER_TIPS"
+    const val USER_PERMISSIONS="USER_PERMISSIONS"
+    const val PER_ONE="PER_ONE"
+    const val PER_TWO="PER_TWO"
 
 
 }

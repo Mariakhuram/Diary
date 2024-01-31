@@ -4,6 +4,7 @@ import android.net.Uri
 import android.view.Gravity
 
 object Static {
+    var PASSWORD_CHANGE = false
     var removehashTagBoolean = false
     var settLang:String?=null
     var gravity:Int?=null

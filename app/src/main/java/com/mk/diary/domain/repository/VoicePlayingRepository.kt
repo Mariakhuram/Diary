@@ -8,4 +8,6 @@ interface VoicePlayingRepository {
     suspend fun stopVoice()
     suspend fun pauseVoice()
     suspend fun releaseVoice()
+
+    suspend fun mediaPlayer()
 }

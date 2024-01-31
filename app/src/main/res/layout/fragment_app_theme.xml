@@ -5,6 +5,53 @@
     android:layout_height="match_parent"
     tools:context="com.mk.diary.presentation.ui.settings.AppThemeFragment">
     <androidx.cardview.widget.CardView
+        android:layout_width="@dimen/_100sdp"
+        app:cardCornerRadius="@dimen/_10sdp"
+        android:visibility="gone"
+        android:id="@+id/showAdDialogue"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="@dimen/_100sdp">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animation_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:padding="@dimen/_10sdp"
+                android:layout_gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/tv"
+                app:lottie_autoPlay="true"
+                android:visibility="visible"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/loading"
+                />
+            <TextView
+                android:id="@+id/tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:textAlignment="center"
+                android:text="Loading Ad"
+                app:layout_constraintTop_toBottomOf="@id/animation_view"
+                android:layout_marginBottom="@dimen/_10sdp"
+                android:textColor="#1F1F1F"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
         app:cardCornerRadius="@dimen/_11sdp"
         android:layout_width="@dimen/_22sdp"
         android:layout_marginStart="@dimen/_20sdp"

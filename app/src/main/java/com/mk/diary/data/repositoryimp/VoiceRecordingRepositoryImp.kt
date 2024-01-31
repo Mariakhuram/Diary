@@ -30,7 +30,6 @@ class VoiceRecordingRepositoryImp @Inject constructor() : VoiceRecordingReposito
                 mediaRecorder?.prepare()
                 mediaRecorder?.start()
                 isRecording = true
-
                 // Initialize duration tracking
                 durationHandler = Handler()
                 recordingDuration = 0
@@ -68,7 +67,6 @@ class VoiceRecordingRepositoryImp @Inject constructor() : VoiceRecordingReposito
             VoiceRecorderHelper.Error("Error stopping recording: ${e.message}")
         }
     }
-
     private val updateDurationRunnable = object : Runnable {
         override fun run() {
             recordingDuration += 1000 // Increment by 1 second

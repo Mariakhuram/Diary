@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+
 import my.dialy.dairy.journal.dairywithlock.R
 import my.dialy.dairy.journal.dairywithlock.databinding.FragmentGetReadyBinding
 

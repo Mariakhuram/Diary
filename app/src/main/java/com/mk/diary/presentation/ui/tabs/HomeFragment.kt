@@ -12,13 +12,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.mk.diary.adapters.recyclerview.HomeFragmentNoteViewRecyclerAdapter
 import com.mk.diary.domain.models.NoteViewModelClass
+import com.mk.diary.firebase.FirebaseKey
+import com.mk.diary.firebase.RealtimeFirebaseInstance
 import com.mk.diary.presentation.viewmodels.noteview.NoteViewModel
 import com.mk.diary.utils.MyConstants
 import com.mk.diary.utils.SharedPrefObj
 import com.mk.diary.utils.companion.Static
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import my.dialy.dairy.journal.dairywithlock.R
 import my.dialy.dairy.journal.dairywithlock.databinding.FragmentHomeBinding
@@ -38,6 +44,8 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+
+
         // Inflate the layout for this fragment
         Static.checkBBB = false
         setRecyclerListType()
@@ -118,6 +126,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
         mAdapter.notifyDataSetChanged()
     }
     private fun recyclerView() {

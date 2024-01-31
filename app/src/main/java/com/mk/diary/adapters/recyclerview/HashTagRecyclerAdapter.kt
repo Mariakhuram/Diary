@@ -15,7 +15,7 @@ import com.mk.diary.utils.companion.Static
 import my.dialy.dairy.journal.dairywithlock.R
 
 
-class HashTagRecyclerAdapter(private val list: List<String>) :
+class HashTagRecyclerAdapter(private val list: ArrayList<String>) :
     RecyclerView.Adapter<HashTagRecyclerAdapter.ViewHolder>() {
     private lateinit var click: HashTagItemClick
     fun hashRecClick(lis:HashTagItemClick){
